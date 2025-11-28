@@ -39,7 +39,10 @@ eval "$(rbenv init - zsh)"
 export PATH="$PATH:/Users/david/.lmstudio/bin"
 # End of LM Studio CLI section
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+# zoxide (better cd) - smart directory navigation
 eval "$(zoxide init zsh)"
+alias cd='z'  # Use zoxide for cd
 
 # ===== Modern CLI Tool Aliases & Configurations =====
 
