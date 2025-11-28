@@ -99,3 +99,24 @@ export FZF_CTRL_T_OPTS="
 # git config --global merge.conflictstyle diff3
 # git config --global diff.colorMoved default
 
+# tlrc (tldr) - simplified man pages
+alias man='tldr'  # Use tldr for quick help
+alias manfull='command man'  # Use original man if needed
+
+# erdtree (better tree) - modern file tree viewer
+alias tree='erd'
+alias treed='erd -L 2'  # 2 levels deep
+alias treef='erd -f'  # files only
+alias treeh='erd -H'  # show hidden files
+
+# hstr - better command history
+alias hh=hstr
+setopt histignorespace
+export HSTR_CONFIG=hicolor
+export HSTR_TIOCSTI=y
+bindkey -s "\C-r" "\C-a hstr -- \C-j"
+
+# pv - pipe viewer for progress
+# Usage: pv file.tar.gz | tar xzf -
+# No aliases needed, use directly in pipes
+
