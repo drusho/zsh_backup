@@ -54,30 +54,42 @@ alias ll='eza -al --group-directories-first'
 alias ls='eza -alF --color=always --sort=size | grep -v /'
 alias lt='eza -al --sort=modified'
 
-# bat (better cat) aliases
-alias cat='bat --style=auto'
-alias catp='bat --style=plain'  # cat with no decorations
+# bat (better cat) - syntax highlighting for files
+alias cat='bat --style=auto'  # Default: use bat instead of cat
+alias bat='bat --style=auto'  # Explicit bat command
+alias catp='bat --style=plain'  # Plain output (no decorations)
 alias bathelp='bat --plain --language=help'
+alias less='bat --style=plain --paging=always'  # Use bat for less
+alias more='bat --style=plain --paging=always'  # Use bat for more
 help() {
     "$@" --help 2>&1 | bathelp
 }
 
-# ripgrep (better grep) aliases
-alias grep='rg'
-alias rgi='rg -i'  # case insensitive
-alias rgl='rg -l'  # show only filenames
+# ripgrep (better grep) - faster searching
+alias grep='rg'  # Default: use ripgrep instead of grep
+alias egrep='rg'  # Extended grep
+alias fgrep='rg -F'  # Fixed string grep
+alias rgi='rg -i'  # Case insensitive
+alias rgl='rg -l'  # Show only filenames
 
-# fd (better find) aliases
-alias find='fd'
+# fd (better find) - simpler and faster
+alias find='fd'  # Default: use fd instead of find
+alias fda='fd -H'  # Show hidden files
+alias fdi='fd -i'  # Case insensitive
 
-# dust (better du) alias
-alias du='dust'
+# dust (better du) - disk usage visualization
+alias du='dust'  # Default: use dust instead of du
+alias dud='dust -d 1'  # One level deep
+alias duall='dust -d 0'  # All levels
 
-# procs (better ps) alias
-alias ps='procs'
+# procs (better ps) - modern process viewer
+alias ps='procs'  # Default: use procs instead of ps
+alias pstree='procs --tree'  # Process tree view
+alias pswatch='procs --watch'  # Watch processes
 
-# btop (better top) alias
-alias top='btop'
+# btop (better top) - beautiful system monitor
+alias top='btop'  # Default: use btop instead of top
+alias htop='btop'  # Also replace htop
 
 # fzf - fuzzy finder integration
 # Set up fzf key bindings and fuzzy completion
