@@ -45,6 +45,7 @@ brew "rclone"
 brew "ripgrep"
 brew "samba"
 brew "speexdsp"
+brew "stow"
 brew "thefuck"
 brew "tldr", link: false
 brew "tlrc"

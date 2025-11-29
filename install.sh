@@ -1,14 +1,20 @@
 #!/bin/zsh
 
-# This script sets up symlinks and installs iTerm2 preferences.
-# It should be run from within the ~/.dotfiles directory.
+# This script sets up symlinks using GNU Stow and installs iTerm2 preferences.
+# It should be run from the home directory.
 
-echo "Creating symlinks for Zsh configuration files..."
-ln -sfn ~/.dotfiles/.zshrc ~/.zshrc
-ln -sfn ~/.dotfiles/.p10k.zsh ~/.p10k.zsh
+echo "Using GNU Stow to create symlinks..."
 
-echo "Creating symlink for tmux configuration..."
-ln -sfn ~/.dotfiles/.tmux.conf ~/.tmux.conf
+# Check if stow is installed
+if ! command -v stow &> /dev/null; then
+    echo "GNU Stow is not installed. Installing via Homebrew..."
+    brew install stow
+fi
+
+# Navigate to home directory and use stow
+cd ~
+stow -d .dotfiles zsh tmux
+echo "✅ Symlinks created for zsh and tmux configurations"
 
 echo "Installing iTerm2 color scheme..."
 # This command tells macOS to open the .itermcolors file,
