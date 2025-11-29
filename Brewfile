@@ -48,6 +48,7 @@ brew "speexdsp"
 brew "thefuck"
 brew "tldr", link: false
 brew "tlrc"
+brew "tmux"
 brew "yt-dlp"
 brew "zlib"
 brew "zoxide"
