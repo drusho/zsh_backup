@@ -8,9 +8,10 @@ This is a **macOS dotfiles repository** for backing up and managing shell config
 
 ## Key Files
 
-- **`.zshrc`** - Zsh shell configuration with Oh My Zsh, Spaceship prompt, and custom functions
+- **`zsh/.zshrc`** - Zsh shell configuration with Oh My Zsh, Spaceship prompt, and custom functions
+- **`tmux/.tmux.conf`** - Tmux configuration with Catppuccin theme and plugins
 - **`Brewfile`** - Complete list of Homebrew packages (CLI tools, apps, VS Code extensions)
-- **`install.sh`** - Setup script that creates symlinks and installs iTerm2 color scheme
+- **`install.sh`** - Setup script that uses GNU Stow to create symlinks and installs iTerm2 color scheme
 - **`Cobalt2.itermcolors`** - iTerm2 color scheme preset
 
 ## Common Commands
@@ -28,10 +29,15 @@ git clone git@github.com:drusho/zsh_backup.git ~/.dotfiles
 cd ~/.dotfiles
 brew bundle install
 
-# 4. Create symlinks and install iTerm2 settings
+# 4. Run installation script (uses GNU Stow for symlinks)
+cd ~
 sh ~/.dotfiles/install.sh
 
-# 5. Restart terminal
+# 5. Install tmux plugins (if using tmux)
+tmux
+# Press: Ctrl-a + I (capital i) to install plugins
+
+# 6. Restart terminal
 ```
 
 ### Updating Configuration Backups
@@ -44,9 +50,10 @@ git add Brewfile
 git commit -m "Update Brewfile"
 git push
 
-# Update shell configuration
+# Update shell configuration (files are symlinked via Stow)
+vim ~/.zshrc  # or vim ~/.tmux.conf
 cd ~/.dotfiles
-git add .zshrc
+git add zsh/.zshrc  # or tmux/.tmux.conf
 git commit -m "Update Zsh configuration"
 git push
 ```
@@ -61,17 +68,20 @@ brew bundle check
 zsh -n install.sh
 
 # Test .zshrc without affecting current session
-zsh -c "source ~/.dotfiles/.zshrc"
+zsh -c "source ~/.zshrc"
 ```
 
 ## Architecture
 
 ### Dotfiles Management Strategy
 
-This repository uses a **centralized dotfiles directory** (`~/.dotfiles`) with symlinks:
-- Configuration files live in `~/.dotfiles/`
-- `install.sh` creates symlinks from home directory to dotfiles directory
-- Pattern: `ln -sfn ~/.dotfiles/.zshrc ~/.zshrc`
+This repository uses **GNU Stow** for dotfile management with a centralized directory:
+- Repository location: `~/Documents/GitHub/zsh_backup` (aliased as `~/.dotfiles`)
+- Configuration files organized in subdirectories: `zsh/.zshrc`, `tmux/.tmux.conf`
+- `install.sh` uses Stow to create symlinks: `stow -d ~/.dotfiles zsh tmux`
+- Stow creates symlinks: `~/.zshrc` → `~/.dotfiles/zsh/.zshrc`
+- When you edit `~/.zshrc`, you're actually editing the file in the repo
+- Changes automatically sync via Git!
 
 ### Zsh Configuration Structure
 
@@ -118,6 +128,8 @@ Several tools must be initialized in `.zshrc`:
 
 ### Symlink Management
 
-When modifying `install.sh`:
-- Use `-sfn` flags: `-s` (symbolic), `-f` (force/overwrite), `-n` (no-dereference)
-- Reference note: `.p10k.zsh` is in `install.sh` but not present in repo (legacy Powerlevel10k config)
+This repository uses GNU Stow for symlink management:
+- Symlinks are created with: `stow -d ~/.dotfiles zsh tmux`
+- To remove symlinks: `stow -D -d ~/.dotfiles zsh tmux`
+- To update symlinks after Git pull: `stow -R -d ~/.dotfiles zsh tmux`
+- See `STOW_USAGE.md` for comprehensive Stow documentation
