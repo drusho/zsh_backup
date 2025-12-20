@@ -1,7 +1,4 @@
-# Path to your Oh My Zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-
-ZSH_THEME="spaceship"
+# Spaceship prompt configuration (managed via Zap plugin manager)
 # Spaceship settings
 SPACESHIP_PROMPT_ASYNC=true
 SPACESHIP_PROMPT_ADD_NEWLINE=true
@@ -16,21 +13,26 @@ SPACESHIP_PROMPT_ORDER=(
   char
 )
 
-plugins=(
-  fast-syntax-highlighting
-  zsh_codex
-  npm
-  node
-  z
-  thefuck
-  virtualenv
-  web-search
-  zsh-autosuggestions
-)
-# This line loads Oh My Zsh and is ESSENTIAL.
-# It must come AFTER the ZSH_THEME and plugins variables are set.
-source $ZSH/oh-my-zsh.sh
-# User configuration, aliases, and functions should go AFTER sourcing Oh My Zsh.
+# Initialize Zap (Zsh plugin manager)
+if [[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ]]; then
+  source "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh"
+else
+  echo "Zap not found. Install it with:" >&2
+  echo "  zsh <(curl -s https://raw.githubusercontent.com/zap-zsh/zap/master/install.zsh)" >&2
+fi
+
+# Plugins managed by Zap
+plug "spaceship-prompt/spaceship-prompt"
+plug "zsh-users/zsh-autosuggestions"
+plug "zdharma-continuum/fast-syntax-highlighting"
+plug "tom-doerr/zsh_codex"
+
+# thefuck integration (replaces Oh My Zsh thefuck plugin)
+if command -v thefuck >/dev/null 2>&1; then
+  eval "$(thefuck --alias)"
+fi
+
+# User configuration, aliases, and functions should go AFTER plugins.
 # For zsh_codex plugin
 bindkey '^X' create_completion
 # rbenv
