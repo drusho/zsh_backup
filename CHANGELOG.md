@@ -152,3 +152,10 @@ All configurations tested and verified working on Mac Air M1 running macOS Sequo
 **New Files**: 2 (WARP.md, CHANGELOG.md)  
 **CLI Tools Added**: 16  
 **Lines of Configuration Added**: ~100
+
+## [2025-12-20] - Switch to Zap Zsh plugin manager
+
+### Changed
+- Migrated `zsh/.zshrc` from Oh My Zsh to the Zap plugin manager while keeping the Spaceship prompt and existing modern tool aliases.
+- Updated `README.md` Shell Configuration section to document Zap instead of Oh My Zsh.
+- Updated `WARP.md` to describe the new Zap-based initialization order and current key Zsh components (removed stale Bitwarden integration notes).

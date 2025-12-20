@@ -8,7 +8,7 @@ This is a **macOS dotfiles repository** for backing up and managing shell config
 
 ## Key Files
 
-- **`zsh/.zshrc`** - Zsh shell configuration with Oh My Zsh, Spaceship prompt, and custom functions
+- **`zsh/.zshrc`** - Zsh shell configuration using the Zap plugin manager, Spaceship prompt, and custom functions
 - **`tmux/.tmux.conf`** - Tmux configuration with Catppuccin theme and plugins
 - **`Brewfile`** - Complete list of Homebrew packages (CLI tools, apps, VS Code extensions)
 - **`install.sh`** - Setup script that uses GNU Stow to create symlinks and installs iTerm2 color scheme
@@ -86,21 +86,17 @@ This repository uses **GNU Stow** for dotfile management with a centralized dire
 ### Zsh Configuration Structure
 
 The `.zshrc` file follows this initialization order:
-1. **Oh My Zsh setup** - Theme and plugin definitions (lines 1-38)
-2. **Source Oh My Zsh** - `source $ZSH/oh-my-zsh.sh` (line 42) - MUST come after theme/plugins
-3. **User configuration** - Custom aliases, functions, tool initialization (lines 44+)
+1. **Prompt and Zap initialization** - Spaceship prompt settings and Zap plugin definitions
+2. **User configuration** - Custom aliases, functions, and tool initialization (modern CLI tools, history, etc.)
 
-**Critical**: User configuration MUST come AFTER sourcing Oh My Zsh to avoid being overwritten.
+**Critical**: User configuration MUST come AFTER Zap initialization so plugins and prompt are available.
 
 ### Key Zsh Components
 
 - **Theme**: Spaceship prompt (async, minimal sections for performance)
-- **Essential plugins**: `git`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
+- **Plugin manager**: Zap (`plug`-based plugin loading)
+- **Essential plugins**: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
 - **Modern tools**: `eza` (replaces `ls`), `zoxide` (replaces `cd`), `thefuck` (command corrections)
-- **Custom functions**:
-  - `bwu()` - Unlocks Bitwarden vault and exports session key
-  - `getpw()` - Retrieves passwords from Bitwarden
-  - `sshnas()` - SSH to NAS using Bitwarden-stored credentials with sshpass
 
 ### Homebrew Management
 
@@ -111,13 +107,6 @@ The `Brewfile` contains three types of installations:
 - `vscode` - VS Code extensions
 
 ## Important Notes
-
-### Bitwarden Integration
-
-The `.zshrc` contains Bitwarden CLI integration for secure credential management:
-- Must run `bwu()` first to unlock vault and export `$BW_SESSION`
-- `sshnas()` function uses sshpass with Bitwarden to SSH without manually entering passwords
-- Bitwarden item IDs are hardcoded in functions (see line 78 for NAS credentials)
 
 ### Tool Dependencies
 

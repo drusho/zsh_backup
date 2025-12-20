@@ -113,9 +113,9 @@ git push
 This setup includes:
 
 ### Shell Configuration
-- **Zsh** (`.zshrc`): Oh My Zsh with Spaceship prompt, modern plugins
-  - `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
-  - `zoxide` (smart cd), `thefuck` (command corrections)
+- **Zsh** (`.zshrc`): Zap plugin manager with Spaceship prompt and modern plugins
+  - Managed via Zap: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
+  - Extra tooling: `zoxide` (smart cd), `thefuck` (command corrections)
 
 ### Terminal Multiplexer
 - **tmux** (`.tmux.conf`): Full mouse support, Catppuccin Mocha theme
