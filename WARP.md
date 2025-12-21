@@ -147,3 +147,57 @@ WezTerm is a modern, GPU-accelerated terminal emulator with the following featur
 - `CMD+K` - Clear scrollback
 
 **Configuration location:** `~/.wezterm.lua` (symlinked to `~/.dotfiles/wezterm/.wezterm.lua`)
+
+### Data Engineer Professional Features
+
+#### Workspace Management
+WezTerm workspaces let you organize terminal sessions by project/context:
+- `CMD+SHIFT+W` - Switch between workspaces (HomeLab, Work, AI-Server, etc.)
+- `CMD+SHIFT+N` - Create new named workspace
+- Each workspace maintains its own tabs and panes
+- Seamlessly switch between local Python dev and remote server work
+
+#### SSH Integration
+Built-in SSH domains for quick homelab access:
+- `CMD+SHIFT+S` - Quick SSH launcher (fuzzy search)
+- Pre-configured: `homelab-nas` (192.168.1.249)
+- Command line: `wezterm connect homelab-nas`
+- SSH sessions survive network reconnections
+
+#### Atuin Shell History
+SQLite-backed shell history with advanced search:
+- `Ctrl+R` - Fuzzy search across unlimited history
+- **Search by exit code** - Find failed commands from days ago
+- Full-text search with context
+- Optional encrypted sync across Mac and Linux servers
+- Critical for Data Engineers running complex multi-line commands
+
+**Installation:**
+```bash
+brew install atuin
+atuin import auto  # Import existing history
+atuin register     # Optional: enable sync
+```
+
+#### Modern Python Tooling (uv)
+`uv` is the 2025 Data Engineer standard for Python (replaces pip/pipx/poetry):
+- `pyx <command>` - Run any Python tool without installing (`uvx`)
+- `uv-jupyter` - Launch Jupyter Lab instantly
+- `uv-ipython` - Quick IPython shell
+- `uv-sync` - Sync project dependencies
+- `uv-venv` - Create virtual environments
+
+**Why uv:**
+- 10-100x faster than pip
+- Production parity (same tool for dev and deployment)
+- Rust-based, handles complex dependency resolution
+- Compatible with pip/pyproject.toml
+
+**Installation:**
+```bash
+brew install uv
+cd your-python-project
+uv init  # Create new project
+uv add pandas polars jupyter  # Add dependencies
+uv run python script.py  # Run in isolated environment
+```

@@ -51,6 +51,8 @@ brew "tmux"
 brew "yt-dlp"
 brew "zlib"
 brew "zoxide"
+brew "atuin" # SQLite-backed shell history (Data Engineer must-have)
+brew "uv" # Modern Python package manager (replaces pip/pipx)
 brew "hudochenkov/sshpass/sshpass"
 cask "alfred"
 cask "bitwarden"

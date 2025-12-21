@@ -92,6 +92,26 @@ config.animation_fps = 60
 config.front_end = "WebGpu" -- Modern GPU-accelerated rendering
 
 -- ============================================================================
+-- SSH & REMOTE CONNECTIONS (Data Engineer workflow)
+-- ============================================================================
+
+-- SSH domains for quick access to homelab
+config.ssh_domains = {
+	{
+		name = "homelab-nas",
+		remote_address = "192.168.1.249",
+		username = "admin",
+		-- Connect with: wezterm connect homelab-nas
+	},
+	-- Add more SSH hosts as needed:
+	-- {
+	--   name = "remote-server",
+	--   remote_address = "your-server.example.com",
+	--   username = "your-username",
+	-- },
+}
+
+-- ============================================================================
 -- BEHAVIOR
 -- ============================================================================
 
@@ -190,6 +210,39 @@ config.keys = {
 		key = "]",
 		mods = "CMD",
 		action = wezterm.action.ActivateTabRelative(1),
+	},
+	-- Workspace management (Data Engineer: switch between projects)
+	{
+		key = "w",
+		mods = "CMD|SHIFT",
+		action = wezterm.action.ShowLauncherArgs({ flags = "FUZZY|WORKSPACES" }),
+	},
+	{
+		key = "n",
+		mods = "CMD|SHIFT",
+		action = wezterm.action.PromptInputLine({
+			description = wezterm.format({
+				{ Attribute = { Intensity = "Bold" } },
+				{ Foreground = { Color = "#44FFB1" } },
+				{ Text = "Enter name for new workspace:" },
+			}),
+			action = wezterm.action_callback(function(window, pane, line)
+				if line then
+					window:perform_action(
+						wezterm.action.SwitchToWorkspace({
+							name = line,
+						}),
+						pane
+					)
+				end
+			end),
+		}),
+	},
+	-- Quick SSH launcher
+	{
+		key = "s",
+		mods = "CMD|SHIFT",
+		action = wezterm.action.ShowLauncherArgs({ flags = "FUZZY|DOMAINS" }),
 	},
 	-- CMD+1-9 to switch to specific tabs
 	{

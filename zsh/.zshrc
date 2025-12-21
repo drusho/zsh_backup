@@ -117,3 +117,46 @@ alias treeh='erd -H'  # show hidden files
 # Usage: pv file.tar.gz | tar xzf -
 # No aliases needed, use directly in pipes
 
+# ===== Data Engineer Professional Tools =====
+
+# atuin - SQLite-backed shell history with search by exit code
+# Replaces Ctrl+R with powerful fuzzy search across all history
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init zsh)"
+  # atuin benefits:
+  # - Search by exit code (find failed commands easily)
+  # - Full-text search across unlimited history
+  # - Optional encrypted sync across machines
+  # Usage: Ctrl+R for fuzzy search, up/down arrows for inline history
+fi
+
+# uv - Modern Python package/project manager (2025 Data Engineer standard)
+# Replaces pip, pipx, poetry, virtualenv with blazing-fast Rust implementation
+if command -v uv >/dev/null 2>&1; then
+  # Quick command execution (like npx/pipx)
+  alias pyx='uvx'  # Example: pyx ruff check .
+  
+  # Project management aliases
+  alias uv-sync='uv sync'  # Install/sync dependencies
+  alias uv-add='uv add'    # Add a dependency
+  alias uv-run='uv run'    # Run in project environment
+  alias uv-venv='uv venv'  # Create virtual environment
+  
+  # Common Data Engineer workflows
+  alias uv-jupyter='uvx jupyter lab'  # Launch Jupyter without global install
+  alias uv-ipython='uvx ipython'      # Quick IPython shell
+fi
+
+# Docker shortcuts for Data Engineer workflows
+if command -v docker >/dev/null 2>&1; then
+  alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'  # Pretty process list
+  alias dlog='docker logs -f'  # Follow logs (usage: dlog container-name)
+  alias dexec='docker exec -it'  # Interactive exec (usage: dexec container-name bash)
+  alias dstop='docker stop $(docker ps -q)'  # Stop all running containers
+  alias dprune='docker system prune -af --volumes'  # Clean up everything (use with caution)
+fi
+
+# Python environment indicator (shows active venv in prompt)
+# This works with uv, virtualenv, conda, etc.
+export VIRTUAL_ENV_DISABLE_PROMPT=1  # Let starship handle it
+
