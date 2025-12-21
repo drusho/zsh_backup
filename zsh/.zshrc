@@ -25,7 +25,6 @@ fi
 plug "spaceship-prompt/spaceship-prompt"
 plug "zsh-users/zsh-autosuggestions"
 plug "zdharma-continuum/fast-syntax-highlighting"
-plug "tom-doerr/zsh_codex"
 
 # thefuck integration (replaces Oh My Zsh thefuck plugin)
 if command -v thefuck >/dev/null 2>&1; then
@@ -33,8 +32,6 @@ if command -v thefuck >/dev/null 2>&1; then
 fi
 
 # User configuration, aliases, and functions should go AFTER plugins.
-# For zsh_codex plugin
-bindkey '^X' create_completion
 # rbenv
 eval "$(rbenv init - zsh)"
 # Added by LM Studio CLI (lms)
@@ -127,13 +124,6 @@ alias tree='erd'
 alias treed='erd -L 2'  # 2 levels deep
 alias treef='erd -f'  # files only
 alias treeh='erd -H'  # show hidden files
-
-# hstr - better command history
-alias hh=hstr
-setopt histignorespace
-export HSTR_CONFIG=hicolor
-export HSTR_TIOCSTI=y
-bindkey -s "\C-r" "\C-a hstr -- \C-j"
 
 # pv - pipe viewer for progress
 # Usage: pv file.tar.gz | tar xzf -
