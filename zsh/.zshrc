@@ -1,3 +1,6 @@
+# ===== PATH Configuration (Load First) =====
+export PATH="$HOME/.local/bin:$PATH"  # uv tools and local binaries
+
 # Starship prompt (Jetpack preset)
 # Configuration: ~/.config/starship.toml
 eval "$(starship init zsh)"
