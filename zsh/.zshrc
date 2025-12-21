@@ -1,17 +1,6 @@
-# Spaceship prompt configuration (managed via Zap plugin manager)
-# Spaceship settings
-SPACESHIP_PROMPT_ASYNC=true
-SPACESHIP_PROMPT_ADD_NEWLINE=true
-SPACESHIP_CHAR_SYMBOL="⚡"
-# Minimal spaceship sections for performance
-SPACESHIP_PROMPT_ORDER=(
-  time
-  user
-  dir
-  git
-  line_sep
-  char
-)
+# Starship prompt (Jetpack preset)
+# Configuration: ~/.config/starship.toml
+eval "$(starship init zsh)"
 
 # Initialize Zap (Zsh plugin manager)
 if [[ -f "${XDG_DATA_HOME:-$HOME/.local/share}/zap/zap.zsh" ]]; then
@@ -22,7 +11,6 @@ else
 fi
 
 # Plugins managed by Zap
-plug "spaceship-prompt/spaceship-prompt"
 plug "zsh-users/zsh-autosuggestions"
 plug "zdharma-continuum/fast-syntax-highlighting"
 
