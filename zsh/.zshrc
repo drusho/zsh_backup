@@ -43,19 +43,21 @@ export PATH="$PATH:/Users/david/.lmstudio/bin"
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # zoxide (better cd) - smart directory navigation
-eval "$(zoxide init zsh)"
-alias cd='z'  # Use zoxide for cd
+eval "$(zoxide init zsh)"  # Initialize zoxide with 'z' and 'zi' commands
 
 # ===== Modern CLI Tool Aliases & Configurations =====
 
 # eza (better ls) aliases
-alias ld='eza -lD'
-alias lf='eza -lF --color=always | grep -v /'
-alias lh='eza -dl .* --group-directories-first'
-alias ll='eza -al --group-directories-first'
-alias ls='eza -alF --color=always --sort=size | grep -v /'
-alias lt='eza -al --sort=modified'
+# Use ls for a detailed, pretty, directory-first listing with git integration
+alias ls='eza -al --group-directories-first --icons --color=always --git'
+# Common variants
+alias ll='eza -al --group-directories-first --icons --git'
+alias ld='eza -lD --icons'
+alias lf='eza -lF --color=always --icons | grep -v /'
+alias lh='eza -dl .* --group-directories-first --icons'
+alias lt='eza -al --sort=modified --icons --git'
 
+# bat (better cat) - syntax highlighting for files
 # bat (better cat) - syntax highlighting for files
 alias cat='bat --style=auto'  # Default: use bat instead of cat
 alias bat='bat --style=auto'  # Explicit bat command
