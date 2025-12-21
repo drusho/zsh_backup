@@ -201,3 +201,64 @@ uv init  # Create new project
 uv add pandas polars jupyter  # Add dependencies
 uv run python script.py  # Run in isolated environment
 ```
+
+#### Tmux for Data Engineers
+Tmux provides session persistence and reproducible workspace layouts for long-running pipelines.
+
+**Key Features:**
+- 100,000 line scrollback for massive logs
+- Auto-save/restore sessions every 15 minutes
+- Fuzzy session switcher with `Ctrl-a + o`
+- Integration with zoxide for smart directory jumping
+- Vim-style navigation between panes
+
+**Prefix key:** `Ctrl-a` (more ergonomic than default `Ctrl-b`)
+
+**Essential keybindings:**
+- `Ctrl-a + |` - Split pane horizontally
+- `Ctrl-a + -` - Split pane vertically
+- `Ctrl-a + h/j/k/l` - Navigate panes (Vim-style)
+- `Ctrl-a + o` - Fuzzy search sessions (with sessionx)
+- `Ctrl-a + r` - Reload configuration
+- `Ctrl-a + I` - Install/update plugins
+
+**Data Engineer Workspace Functions:**
+
+1. **de-work** - Launch 3-pane development environment:
+   ```bash
+   de-work [session-name]
+   # Left: Code editor
+   # Right-top: btop (system monitor)
+   # Right-bottom: Python REPL or logs
+   ```
+
+2. **pipeline-watch** - Monitor data pipeline with live logs:
+   ```bash
+   pipeline-watch /path/to/pipeline.log
+   # Top-left: btop (resource usage)
+   # Top-right: tail -f (live logs)
+   # Bottom-right: Python REPL for testing
+   ```
+
+3. **homelab-ssh** - Quick SSH to homelab with dedicated tmux window:
+   ```bash
+   homelab-ssh [window-name]
+   # Creates/reuses HomeLab session
+   # Opens new window with SSH to 192.168.1.249
+   ```
+
+**Plugin highlights:**
+- **tmux-sessionx** - Fuzzy session switcher (industry standard 2025)
+- **tmux-resurrect** - Save/restore sessions
+- **tmux-continuum** - Auto-save every 15 minutes
+- **vim-tmux-navigator** - Seamless navigation between tmux/vim
+- **catppuccin** - Modern, high-readability theme
+
+**Installing plugins:**
+```bash
+# Start tmux
+tmux
+
+# Press: Ctrl-a + I (capital i)
+# Wait for plugins to install
+```

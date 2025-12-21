@@ -160,3 +160,95 @@ fi
 # This works with uv, virtualenv, conda, etc.
 export VIRTUAL_ENV_DISABLE_PROMPT=1  # Let starship handle it
 
+# ===== Tmux Workspace Functions (Data Engineer) =====
+
+# Launch a 3-pane Data Engineering workspace
+# Usage: de-work [session-name]
+de-work() {
+  local session_name="${1:-DE}"
+  
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    echo "Session '$session_name' already exists. Attaching..."
+    tmux attach-session -t "$session_name"
+    return
+  fi
+  
+  tmux new-session -d -s "$session_name"
+  tmux rename-window 'Dev'
+  
+  # Split into 3 panes: Code (main), Logs (right-top), Monitor (right-bottom)
+  tmux split-window -h
+  tmux split-window -v
+  
+  # Pane 1 (left): Main coding area
+  tmux select-pane -t 1
+  
+  # Pane 2 (right-top): System monitor
+  tmux select-pane -t 2
+  tmux send-keys 'btop' C-m
+  
+  # Pane 3 (right-bottom): Python REPL or logs
+  tmux select-pane -t 3
+  tmux send-keys 'echo "Ready for logs or Python REPL"' C-m
+  
+  # Focus back on main pane
+  tmux select-pane -t 1
+  tmux attach-session -t "$session_name"
+}
+
+# Launch a pipeline monitoring workspace
+# Usage: pipeline-watch <log-file-path>
+pipeline-watch() {
+  if [[ -z "$1" ]]; then
+    echo "Usage: pipeline-watch <log-file-path>"
+    return 1
+  fi
+  
+  local log_file="$1"
+  local session_name="monitor-$(basename "$log_file" .log)"
+  
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    echo "Monitoring session already exists. Attaching..."
+    tmux attach-session -t "$session_name"
+    return
+  fi
+  
+  tmux new-session -d -s "$session_name"
+  tmux rename-window 'Pipeline'
+  
+  # Pane 1: Hardware monitor (top-left)
+  tmux send-keys 'btop' C-m
+  
+  # Pane 2: Live logs (top-right)
+  tmux split-window -h
+  tmux send-keys "tail -f '$log_file'" C-m
+  
+  # Pane 3: Python REPL for testing (bottom-right)
+  tmux split-window -v
+  tmux send-keys 'python3' C-m
+  
+  # Focus on logs pane
+  tmux select-pane -t 2
+  tmux attach-session -t "$session_name"
+}
+
+# Quick homelab SSH with tmux session
+# Usage: homelab-ssh [window-name]
+homelab-ssh() {
+  local window_name="${1:-homelab}"
+  local session_name="HomeLab"
+  
+  if ! tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux new-session -d -s "$session_name"
+  fi
+  
+  tmux new-window -t "$session_name" -n "$window_name"
+  tmux send-keys -t "$session_name:$window_name" 'ssh admin@192.168.1.249' C-m
+  
+  if [[ -z "$TMUX" ]]; then
+    tmux attach-session -t "$session_name"
+  else
+    tmux switch-client -t "$session_name"
+  fi
+}
+
