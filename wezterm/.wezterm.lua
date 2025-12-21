@@ -45,7 +45,7 @@ config.macos_window_background_blur = 20
 config.window_decorations = "RESIZE"
 
 -- Font Configuration
-config.font = wezterm.font("MesloLGS Nerd Font Mono")
+config.font = wezterm.font("JetBrains Mono Nerd Font")
 config.font_size = 13.0
 config.line_height = 1.0
 

@@ -1,0 +1,57 @@
+# ===== Modern Unix Overrides =====
+alias ls='eza --icons --git --group-directories-first'
+alias ll='eza -lh --icons --git'
+alias la='eza -a --icons --git'
+alias lt='eza --tree --level=2 --icons'  # Quick directory tree
+alias cat='bat --paging=never'
+alias grep='rg'
+alias find='fd'
+alias cd='z'  # Use zoxide for smarter jumping
+alias du='dust -r'  # Readable disk usage
+alias top='btop'
+alias help='tldr'
+
+# ===== Data Engineering Essentials =====
+# Query CSV/Parquet instantly without a notebook
+alias dsql='duckdb'
+alias dparquet='duckdb -c "SELECT * FROM read_parquet($1) LIMIT 10;"'
+
+# SQL Linting (via uv tool)
+alias sql-check='sqlfluff lint'
+alias sql-fix='sqlfluff fix'
+
+# ===== Python & UV (The 2025 Standard) =====
+alias py='python3'
+alias venv='uv venv'
+alias activate='source .venv/bin/activate'
+alias pip='uv pip'
+# Run any python tool without installing it (e.g., pyx black .)
+alias pyx='uvx'
+
+# ===== Tmux & Persistence =====
+alias ta='tmux attach -t'
+alias tn='tmux new -s'
+alias tl='tmux ls'
+alias tk='tmux kill-session -t'
+
+# ===== Git & DevOps (Production Ready) =====
+alias gs='git status'
+alias gp='git push'
+alias gl='git log --oneline --graph --decorate'
+alias gd='git diff'
+alias gca='git commit -am'
+# Clean up merged local branches
+alias git-clean="git branch --merged | grep -v '^\*' | xargs -n 1 git branch -d"
+
+# ===== Homelab & Server Management =====
+# Quick SSH to homelab NAS
+alias homelab='ssh admin@192.168.1.249'
+# Sync local folder to server via rclone
+alias sync-lab='rclone sync ~/projects/ homelab:projects/ --progress'
+
+# ===== Docker Management (Already defined in .zshrc, but here for reference) =====
+# dps - Pretty docker ps
+# dlog - Follow container logs
+# dexec - Interactive exec into container
+# dstop - Stop all running containers
+# dprune - Clean up docker system

@@ -12,8 +12,9 @@ brew "btop"
 brew "fmt"
 brew "ccache"
 brew "curl"
+brew "direnv"  # Automatic environment switching for projects
+brew "duckdb"  # In-process SQL database for data analysis
 brew "dust"
-brew "erdtree"
 brew "eza"
 brew "fd"
 brew "sdl2"
@@ -51,8 +52,8 @@ brew "tmux"
 brew "yt-dlp"
 brew "zlib"
 brew "zoxide"
-brew "atuin" # SQLite-backed shell history (Data Engineer must-have)
-brew "uv" # Modern Python package manager (replaces pip/pipx)
+brew "atuin"  # SQLite-backed shell history (Data Engineer must-have)
+brew "uv"  # Modern Python package manager (replaces pip/pipx)
 brew "hudochenkov/sshpass/sshpass"
 cask "alfred"
 cask "bitwarden"
@@ -62,10 +63,8 @@ cask "font-fira-code-nerd-font"
 cask "font-jetbrains-mono-nerd-font"
 cask "google-chrome"
 cask "iina"
-cask "iterm2"
 cask "karabiner-elements"
 cask "obsidian"
-cask "raycast"
 cask "rectangle"
 cask "steam"
 cask "tinymediamanager"

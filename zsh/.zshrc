@@ -22,13 +22,14 @@ fi
 # User configuration, aliases, and functions should go AFTER plugins.
 # rbenv
 eval "$(rbenv init - zsh)"
-# Added by LM Studio CLI (lms)
-export PATH="$PATH:/Users/david/.lmstudio/bin"
-# End of LM Studio CLI section
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
 # zoxide (better cd) - smart directory navigation
 eval "$(zoxide init zsh)"  # Initialize zoxide with 'z' and 'zi' commands
+
+# direnv - automatic environment switching for projects
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook zsh)"
+fi
 
 # ===== Modern CLI Tool Aliases & Configurations =====
 
@@ -251,4 +252,10 @@ homelab-ssh() {
     tmux switch-client -t "$session_name"
   fi
 }
+
+# ===== Load Additional Aliases =====
+# Source modern Data Engineer aliases from separate file
+if [ -f ~/.zsh_aliases ]; then
+    source ~/.zsh_aliases
+fi
 
