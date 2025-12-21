@@ -114,8 +114,8 @@ This setup includes:
 
 ### Shell Configuration
 - **Zsh** (`.zshrc`): Zap plugin manager with Spaceship prompt and modern plugins
-  - Managed via Zap: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
-  - Extra tooling: `zoxide` (smart cd), `thefuck` (command corrections)
+  - Managed via Zap: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`
+  - Extra tooling: `zoxide` (smart cd with `z` command), `thefuck` (command corrections), `fzf` (fuzzy search)
 
 ### Terminal Multiplexer
 - **tmux** (`.tmux.conf`): Full mouse support, Catppuccin Mocha theme
@@ -132,11 +132,10 @@ This setup includes:
 - **procs** → replaces `ps` (modern process viewer)
 - **btop** → replaces `top` (beautiful system monitor)
 - **git-delta** → enhanced git diffs
-- **fzf** → fuzzy finder (Ctrl-T, Ctrl-R, Alt-C)
+- **fzf** → fuzzy finder and history search (Ctrl-T, Ctrl-R, Alt-C)
 - **tlrc** → simplified man pages
 - **erdtree** → modern tree viewer
-- **hstr** → better command history (Ctrl-R)
-- **zoxide** → smart directory jumper
+- **zoxide** → smart directory navigation (`z` command)
 
 ### Visual Customization
 - **iTerm2 Color Scheme**: Cobalt2 preset
@@ -152,3 +151,136 @@ This setup includes:
 - **WARP.md**: Configuration guide for AI assistants
 - **CHANGELOG.md**: Complete history of changes
 - **README.md**: This file - setup and usage instructions
+- **STOW_USAGE.md**: GNU Stow reference guide
+
+## 🎯 Quick Start: Using Your New Tools
+
+After setup, here's how to use the modern CLI tools that replace traditional commands:
+
+### Smart Navigation
+```bash
+# zoxide - Smart directory jumping (learns from your habits)
+z Documents          # Jump to ~/Documents
+z down               # Jump to ~/Downloads (fuzzy match)
+zi                   # Interactive directory picker
+
+# Note: cd still works normally, but z learns and gets smarter over time
+```
+
+### Enhanced Listing & Viewing
+```bash
+# eza - Modern ls with icons and git integration
+ls                   # Auto-aliased to eza with icons, colors, git status
+ll                   # Detailed listing
+lt                   # Sort by modification time
+ld                   # List directories only
+lh                   # List hidden files
+
+# bat - cat with syntax highlighting
+cat file.js          # Auto-aliased to bat (syntax highlighting)
+catp file.js         # Plain output (no decorations)
+bat file.py          # Explicit bat command
+```
+
+### Powerful Search
+```bash
+# fzf - Fuzzy finder (already integrated)
+Ctrl+R               # Search command history (fuzzy)
+Ctrl+T               # Search files (with preview)
+Alt+C                # Search directories (cd into selection)
+
+# ripgrep - Fast code search
+grep "function"       # Auto-aliased to ripgrep (respects .gitignore)
+rg -i "TODO"         # Case-insensitive search
+rgl "error"          # Show only filenames
+
+# fd - Simple find alternative
+find "*.js"          # Auto-aliased to fd
+fd -e py             # Find all Python files
+fda "config"         # Include hidden files
+```
+
+### System Monitoring
+```bash
+# btop - Beautiful system monitor
+top                  # Auto-aliased to btop
+htop                 # Also aliased to btop
+
+# procs - Modern process viewer
+ps                   # Auto-aliased to procs
+ps grep chrome       # Search processes
+pstree               # Show process tree
+
+# dust - Visual disk usage
+du                   # Auto-aliased to dust
+dud                  # One level deep
+duall                # All levels
+```
+
+### File Trees & Help
+```bash
+# erdtree - Modern tree viewer
+tree                 # Auto-aliased to erdtree
+treed                # 2 levels deep
+treeh                # Include hidden files
+
+# tlrc - Quick command reference
+man tar              # Auto-aliased to tldr (simplified)
+manfull tar          # Use traditional man page
+```
+
+### Command Corrections
+```bash
+# thefuck - Fix command typos
+gti status           # Typo!
+fuck                 # Runs: git status (auto-corrects)
+```
+
+### Zsh Plugins (Auto-Active)
+- **zsh-autosuggestions**: Type a command, see gray suggestions from history (press → to accept)
+- **fast-syntax-highlighting**: Commands turn green (valid) or red (invalid) as you type
+- **spaceship-prompt**: Shows git branch, status, and more in your prompt
+
+### Tmux Quick Reference
+```bash
+# Start tmux
+tmux
+
+# Prefix key: Ctrl-a (not Ctrl-b)
+Ctrl-a + c           # Create new window
+Ctrl-a + "           # Split pane horizontally
+Ctrl-a + %           # Split pane vertically
+Ctrl-a + arrow       # Navigate panes
+Ctrl-a + d           # Detach session
+tmux attach          # Re-attach to session
+```
+
+### Nerd Fonts Setup
+For icons to display correctly in your terminal:
+
+1. **Already installed**: `font-jetbrains-mono-nerd-font`, `font-fira-code-nerd-font`
+2. **iTerm2**: Preferences → Profiles → Text → Font → Select "JetBrainsMono Nerd Font Mono"
+3. **Warp**: Settings → Appearance → Text → Font Family → Select "FiraCode Nerd Font" (if available)
+4. **Terminal.app**: Preferences → Profiles → Font → Select a Nerd Font
+
+---
+
+## 🔧 Troubleshooting
+
+### Icons show as question marks
+- Install a Nerd Font: `brew install --cask font-jetbrains-mono-nerd-font`
+- Configure your terminal to use it (see Nerd Fonts Setup above)
+
+### Command not found: z
+- Run: `source ~/.zshrc`
+- Verify zoxide is installed: `which zoxide`
+
+### Symlinks not working
+- Remove existing file: `rm ~/.zshrc`
+- Re-run stow: `stow -d ~/.dotfiles -t ~ zsh`
+- Verify: `ls -la ~/.zshrc` (should show `->`)
+
+### FZF history search not working
+- Verify fzf is installed: `which fzf`
+- Reload config: `source ~/.zshrc`
+- Test: Press `Ctrl+R` in terminal

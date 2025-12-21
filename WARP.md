@@ -95,8 +95,9 @@ The `.zshrc` file follows this initialization order:
 
 - **Theme**: Spaceship prompt (async, minimal sections for performance)
 - **Plugin manager**: Zap (`plug`-based plugin loading)
-- **Essential plugins**: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`, `zsh_codex`
-- **Modern tools**: `eza` (replaces `ls`), `zoxide` (replaces `cd`), `thefuck` (command corrections)
+- **Essential plugins**: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`
+- **Modern tools**: `eza` (replaces `ls`), `zoxide` (`z` command for smart navigation), `fzf` (fuzzy finder and history search), `thefuck` (command corrections)
+- **History search**: FZF integration via `Ctrl+R` (industry standard, replaces hstr)
 
 ### Homebrew Management
 
@@ -112,8 +113,10 @@ The `Brewfile` contains three types of installations:
 
 Several tools must be initialized in `.zshrc`:
 - **rbenv** - Ruby version manager (`eval "$(rbenv init - zsh)"`)
-- **zoxide** - Smart directory navigation (`eval "$(zoxide init zsh)"`)
-- **iTerm2 shell integration** - Required for iTerm2 features (line 86)
+- **zoxide** - Smart directory navigation (`eval "$(zoxide init zsh)"`) - creates `z` and `zi` commands
+- **fzf** - Fuzzy finder integration (`source <(fzf --zsh)`) - enables Ctrl+R history search, Ctrl+T file search, Alt+C directory search
+- **thefuck** - Command correction (`eval "$(thefuck --alias)"`) - creates `fuck` alias
+- **iTerm2 shell integration** - Required for iTerm2 features
 
 ### Symlink Management
 
