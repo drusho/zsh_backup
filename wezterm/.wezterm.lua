@@ -11,7 +11,8 @@ local config = wezterm.config_builder()
 -- Color Scheme (Custom Cobalt2-inspired theme)
 config.colors = {
 	foreground = "#CBE0F0",
-	background = "#0a436e",
+	-- background = "#0a436e",
+	-- background = "rgba(0,0,0,0)",
 	cursor_bg = "#47FF9C",
 	cursor_border = "#47FF9C",
 	cursor_fg = "#011423",
@@ -40,9 +41,47 @@ config.colors = {
 }
 
 -- Window Appearance
+
 config.window_background_opacity = 0.8
-config.macos_window_background_blur = 20
+config.macos_window_background_blur = 30 -- Adds a professional 'frosted glass' effect on Mac
 config.window_decorations = "RESIZE"
+
+-- -- 1. Cyberpunk Aesthetic & Transparency -- --
+config.background = {
+    {
+        source = {
+            Gradient = {
+                orientation = { Linear = { angle = 45.0 } },
+                colors = {
+                    '#0f0c29', -- Deep Space
+                    '#302b63', -- Cyber Purple
+                    '#24243e', -- Night Blue			
+                    '#ff00ff', -- Optional: Add a hint of neon pink at the edge
+},
+                interpolation = 'Linear',
+                -- 'preset' removed to allow custom 'colors' array to work
+            },
+        },
+        width = '100%',
+        height = '100%',
+        opacity = 0.9, 
+    },
+}
+
+-- Ensures your cursor doesn't get lost in the gradient
+config.default_cursor_style = 'BlinkingBlock'
+config.cursor_blink_rate = 1500
+config.force_reverse_video_cursor = true
+
+-- -- 2. Visual Polish -- --
+config.color_scheme = 'Cobalt2' -- Matches your existing theme preference
+config.inactive_pane_hsb = {
+  saturation = 0.5,
+  brightness = 0.3,
+}
+
+-- return config
+
 
 -- Font Configuration
 config.font = wezterm.font("JetBrainsMono Nerd Font")
