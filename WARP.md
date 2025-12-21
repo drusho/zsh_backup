@@ -4,12 +4,13 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Repository Purpose
 
-This is a **macOS dotfiles repository** for backing up and managing shell configurations, Homebrew packages, and iTerm2 settings. The goal is to enable complete restoration of a development environment on any new Mac.
+This is a **macOS dotfiles repository** for backing up and managing shell configurations, Homebrew packages, iTerm2 settings, and WezTerm configuration. The goal is to enable complete restoration of a development environment on any new Mac.
 
 ## Key Files
 
 - **`zsh/.zshrc`** - Zsh shell configuration using the Zap plugin manager, Spaceship prompt, and custom functions
 - **`tmux/.tmux.conf`** - Tmux configuration with Catppuccin theme and plugins
+- **`wezterm/.wezterm.lua`** - WezTerm terminal emulator configuration with Cobalt2-inspired theme
 - **`Brewfile`** - Complete list of Homebrew packages (CLI tools, apps, VS Code extensions)
 - **`install.sh`** - Setup script that uses GNU Stow to create symlinks and installs iTerm2 color scheme
 - **`Cobalt2.itermcolors`** - iTerm2 color scheme preset
@@ -51,9 +52,9 @@ git commit -m "Update Brewfile"
 git push
 
 # Update shell configuration (files are symlinked via Stow)
-vim ~/.zshrc  # or vim ~/.tmux.conf
+vim ~/.zshrc  # or vim ~/.tmux.conf or vim ~/.wezterm.lua
 cd ~/.dotfiles
-git add zsh/.zshrc  # or tmux/.tmux.conf
+git add zsh/.zshrc  # or tmux/.tmux.conf or wezterm/.wezterm.lua
 git commit -m "Update Zsh configuration"
 git push
 ```
@@ -77,10 +78,10 @@ zsh -c "source ~/.zshrc"
 
 This repository uses **GNU Stow** for dotfile management with a centralized directory:
 - Repository location: `~/Documents/GitHub/zsh_backup` (aliased as `~/.dotfiles`)
-- Configuration files organized in subdirectories: `zsh/.zshrc`, `tmux/.tmux.conf`
-- `install.sh` uses Stow to create symlinks: `stow -d ~/.dotfiles zsh tmux`
-- Stow creates symlinks: `~/.zshrc` → `~/.dotfiles/zsh/.zshrc`
-- When you edit `~/.zshrc`, you're actually editing the file in the repo
+- Configuration files organized in subdirectories: `zsh/.zshrc`, `tmux/.tmux.conf`, `wezterm/.wezterm.lua`
+- `install.sh` uses Stow to create symlinks: `stow -d ~/.dotfiles zsh tmux wezterm`
+- Stow creates symlinks: `~/.zshrc` → `~/.dotfiles/zsh/.zshrc`, `~/.wezterm.lua` → `~/.dotfiles/wezterm/.wezterm.lua`
+- When you edit `~/.zshrc` or `~/.wezterm.lua`, you're actually editing the file in the repo
 - Changes automatically sync via Git!
 
 ### Zsh Configuration Structure
@@ -121,7 +122,28 @@ Several tools must be initialized in `.zshrc`:
 ### Symlink Management
 
 This repository uses GNU Stow for symlink management:
-- Symlinks are created with: `stow -d ~/.dotfiles zsh tmux`
-- To remove symlinks: `stow -D -d ~/.dotfiles zsh tmux`
-- To update symlinks after Git pull: `stow -R -d ~/.dotfiles zsh tmux`
+- Symlinks are created with: `stow -d ~/.dotfiles zsh tmux wezterm`
+- To remove symlinks: `stow -D -d ~/.dotfiles zsh tmux wezterm`
+- To update symlinks after Git pull: `stow -R -d ~/.dotfiles zsh tmux wezterm`
 - See `STOW_USAGE.md` for comprehensive Stow documentation
+
+### WezTerm Configuration
+
+WezTerm is a modern, GPU-accelerated terminal emulator with the following features:
+- **Custom Cobalt2-inspired color scheme** - Matches iTerm2 Cobalt2 theme
+- **Minimal professional tab bar** - Clean styling, hidden when only one tab
+- **High performance** - WebGPU rendering at 120 FPS
+- **Built-in pane splitting** - No need for tmux for basic splitting
+- **macOS integration** - Copy-on-select, right-click paste
+
+**Key bindings:**
+- `CMD+T` - New tab
+- `CMD+W` - Close pane/tab (with confirmation)
+- `CMD+[` / `CMD+]` - Previous/next tab
+- `CMD+1-9` - Jump to specific tab
+- `CMD+SHIFT+|` - Split horizontally
+- `CMD+SHIFT+_` - Split vertically
+- `CMD+Arrow` - Navigate between panes
+- `CMD+K` - Clear scrollback
+
+**Configuration location:** `~/.wezterm.lua` (symlinked to `~/.dotfiles/wezterm/.wezterm.lua`)

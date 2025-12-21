@@ -13,7 +13,7 @@ fi
 
 # Navigate to home directory and use stow
 cd ~
-stow -d .dotfiles zsh tmux
+stow -d .dotfiles zsh tmux wezterm
 
 # Create .config directory if it doesn't exist
 mkdir -p ~/.config
@@ -25,7 +25,7 @@ if [ -f ~/.config/starship.toml ]; then
 fi
 ln -s ~/.dotfiles/starship/starship.toml ~/.config/starship.toml
 
-echo "✅ Symlinks created for zsh, tmux, and starship configurations"
+echo "✅ Symlinks created for zsh, tmux, wezterm, and starship configurations"
 
 echo "Installing iTerm2 color scheme..."
 # This command tells macOS to open the .itermcolors file,

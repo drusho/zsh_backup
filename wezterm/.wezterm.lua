@@ -1,0 +1,243 @@
+-- Pull in the wezterm API
+local wezterm = require("wezterm")
+
+-- Initialize configuration builder
+local config = wezterm.config_builder()
+
+-- ============================================================================
+-- APPEARANCE
+-- ============================================================================
+
+-- Color Scheme (Custom Cobalt2-inspired theme)
+config.colors = {
+	foreground = "#CBE0F0",
+	background = "#0a436e",
+	cursor_bg = "#47FF9C",
+	cursor_border = "#47FF9C",
+	cursor_fg = "#011423",
+	selection_bg = "#033259",
+	selection_fg = "#CBE0F0",
+	ansi = {
+		"#214969", -- black
+		"#E52E2E", -- red
+		"#44FFB1", -- green
+		"#FFE073", -- yellow
+		"#0FC5ED", -- blue
+		"#a277ff", -- magenta
+		"#24EAF7", -- cyan
+		"#24EAF7", -- white
+	},
+	brights = {
+		"#214969", -- bright black
+		"#E52E2E", -- bright red
+		"#44FFB1", -- bright green
+		"#FFE073", -- bright yellow
+		"#A277FF", -- bright blue
+		"#a277ff", -- bright magenta
+		"#24EAF7", -- bright cyan
+		"#24EAF7", -- bright white
+	},
+}
+
+-- Window Appearance
+config.window_background_opacity = 0.8
+config.macos_window_background_blur = 20
+config.window_decorations = "RESIZE"
+
+-- Font Configuration
+config.font = wezterm.font("MesloLGS Nerd Font Mono")
+config.font_size = 13.0
+config.line_height = 1.0
+
+-- Tab Bar - Minimal professional style
+config.enable_tab_bar = true
+config.use_fancy_tab_bar = false -- Use simple/retro tab bar for clean look
+config.hide_tab_bar_if_only_one_tab = true
+config.tab_bar_at_bottom = false
+config.tab_max_width = 32
+
+-- Tab bar colors (matches Cobalt2 theme)
+config.colors.tab_bar = {
+	background = "#0a2540",
+	active_tab = {
+		bg_color = "#0a436e",
+		fg_color = "#CBE0F0",
+		intensity = "Bold",
+	},
+	inactive_tab = {
+		bg_color = "#0a2540",
+		fg_color = "#6B8BA3",
+	},
+	inactive_tab_hover = {
+		bg_color = "#0a3050",
+		fg_color = "#CBE0F0",
+		italic = false,
+	},
+	new_tab = {
+		bg_color = "#0a2540",
+		fg_color = "#6B8BA3",
+	},
+	new_tab_hover = {
+		bg_color = "#0a3050",
+		fg_color = "#CBE0F0",
+	},
+}
+
+-- ============================================================================
+-- PERFORMANCE
+-- ============================================================================
+
+config.max_fps = 120
+config.animation_fps = 60
+config.front_end = "WebGpu" -- Modern GPU-accelerated rendering
+
+-- ============================================================================
+-- BEHAVIOR
+-- ============================================================================
+
+-- Scrollback
+config.scrollback_lines = 10000
+
+-- Window padding
+config.window_padding = {
+	left = 2,
+	right = 2,
+	top = 0,
+	bottom = 0,
+}
+
+-- macOS-specific settings
+config.native_macos_fullscreen_mode = false -- Better window management
+config.quit_when_all_windows_are_closed = false -- Keep app running
+
+-- Mouse bindings - macOS standard behavior
+config.mouse_bindings = {
+	-- Copy on select (like iTerm2)
+	{
+		event = { Up = { streak = 1, button = "Left" } },
+		mods = "NONE",
+		action = wezterm.action.CompleteSelection("ClipboardAndPrimarySelection"),
+	},
+	-- Paste on right-click
+	{
+		event = { Down = { streak = 1, button = "Right" } },
+		mods = "NONE",
+		action = wezterm.action.PasteFrom("Clipboard"),
+	},
+}
+
+-- ============================================================================
+-- KEY BINDINGS
+-- ============================================================================
+
+config.keys = {
+	-- Disable default CMD+K clear scrollback (can be confusing)
+	{
+		key = "k",
+		mods = "CMD",
+		action = wezterm.action.ClearScrollback("ScrollbackOnly"),
+	},
+	-- Split panes (like tmux)
+	{
+		key = "|",
+		mods = "CMD|SHIFT",
+		action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
+	},
+	{
+		key = "_",
+		mods = "CMD|SHIFT",
+		action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
+	},
+	-- Navigate panes with CMD+Arrow
+	{
+		key = "LeftArrow",
+		mods = "CMD",
+		action = wezterm.action.ActivatePaneDirection("Left"),
+	},
+	{
+		key = "RightArrow",
+		mods = "CMD",
+		action = wezterm.action.ActivatePaneDirection("Right"),
+	},
+	{
+		key = "UpArrow",
+		mods = "CMD",
+		action = wezterm.action.ActivatePaneDirection("Up"),
+	},
+	{
+		key = "DownArrow",
+		mods = "CMD",
+		action = wezterm.action.ActivatePaneDirection("Down"),
+	},
+	-- Close pane
+	{
+		key = "w",
+		mods = "CMD",
+		action = wezterm.action.CloseCurrentPane({ confirm = true }),
+	},
+	-- Tab management
+	{
+		key = "t",
+		mods = "CMD",
+		action = wezterm.action.SpawnTab("CurrentPaneDomain"),
+	},
+	{
+		key = "[",
+		mods = "CMD",
+		action = wezterm.action.ActivateTabRelative(-1),
+	},
+	{
+		key = "]",
+		mods = "CMD",
+		action = wezterm.action.ActivateTabRelative(1),
+	},
+	-- CMD+1-9 to switch to specific tabs
+	{
+		key = "1",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(0),
+	},
+	{
+		key = "2",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(1),
+	},
+	{
+		key = "3",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(2),
+	},
+	{
+		key = "4",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(3),
+	},
+	{
+		key = "5",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(4),
+	},
+	{
+		key = "6",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(5),
+	},
+	{
+		key = "7",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(6),
+	},
+	{
+		key = "8",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(7),
+	},
+	{
+		key = "9",
+		mods = "CMD",
+		action = wezterm.action.ActivateTab(8),
+	},
+}
+
+-- and finally, return the configuration to wezterm
+return config
