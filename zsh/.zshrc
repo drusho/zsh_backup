@@ -256,7 +256,7 @@ if ${IS_LINUX:-false}; then
   alias storage='pvesm status'                # Status of all configured storage
 
   # Proxmox hypervisor helpers
-  alias pvestat='pvestatac status'                 # Quick cluster health
+  alias pvestat='pvecm status'                     # Quick cluster / node status
   alias vmlist='qm list'                           # List all VMs
   alias ctlist='pct list'                          # List all Containers
   alias vmlog='tail -f /var/log/pve/tasks/index'   # Real-time task logs
