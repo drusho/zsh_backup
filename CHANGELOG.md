@@ -153,6 +153,33 @@ All configurations tested and verified working on Mac Air M1 running macOS Sequo
 **CLI Tools Added**: 16  
 **Lines of Configuration Added**: ~100
 
+## [2025-12-25] - OS-aware Proxmox shell, host-local overrides, and nano theme
+
+### Added
+
+- OS-aware Zsh configuration for Linux/Proxmox nodes using the same dotfiles repo as macOS.
+- Proxmox-specific aliases and helpers on Linux hosts (`vms`, `cts`, `pve-top`, `pve-logs`, `storage`, `update`, `cleanup`).
+- A smarter `pvestat` helper implemented as a function:
+  - On clustered nodes: runs `pvecm status`.
+  - On standalone nodes: falls back to `pveversion -v` to avoid corosync errors.
+- Support for host-local overrides via `~/.zshrc.local`, sourced near the end of `.zshrc`:
+  - Intended for per-host settings that should not be synced via Git (e.g., Proxmox-only env vars or Starship config).
+- Recommended Proxmox nano configuration (`~/.nanorc`) with:
+  - Line numbers, soft-wrap, smooth scrolling, mouse support.
+  - Cobalt2-inspired dark blue UI colors (blue chrome, yellow/white/cyan accents).
+  - Full syntax highlighting via `include "/usr/share/nano/*.nanorc"`.
+
+### Changed
+
+- `README.md` updated to document Linux/Proxmox usage, host-local overrides, and the `pvestat` behavior.
+- `STOW_USAGE.md` updated with Proxmox/Linux setup instructions and notes about `~/.zshrc.local` being outside of Stow/Git.
+- `WARP.md` updated to reflect Starship-based, OS-aware Zsh initialization, Linux/Proxmox helpers, and host-local overrides.
+
+### Notes
+
+- Proxmox servers now use the same Zsh experience as macOS while allowing localized tweaks via `~/.zshrc.local` and `~/.nanorc`.
+- These changes are backward compatible with existing macOS setups.
+
 ## [2025-12-20] - Switch to Zap Zsh plugin manager
 
 ### Changed

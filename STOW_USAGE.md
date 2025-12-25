@@ -172,6 +172,8 @@ chsh -s "$(command -v zsh)"
 
 On Linux, `.zshrc` automatically sets `IS_LINUX=true` and enables Proxmox/homelab aliases while reusing the same core config as macOS.
 
+Host-specific tweaks (like Proxmox-only environment variables or UI preferences) should go into `~/.zshrc.local`, which is **not** managed by Stow or Git and is sourced near the end of `.zshrc`.
+
 ## Troubleshooting
 
 ### Stow Says "Existing Target"

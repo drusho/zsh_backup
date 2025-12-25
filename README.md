@@ -82,7 +82,9 @@ The Zsh configuration is OS-aware and works on Linux/Proxmox terminals in additi
 
 On Linux/Proxmox hosts:
 - `.zshrc` auto-detects Linux (`IS_LINUX=true`) and enables Proxmox/homelab aliases like `vms`, `cts`, `pvestat`, `pve-logs`, `storage`, `update`, and `cleanup`.
+- The `pvestat` helper is a smart function: on clustered nodes it runs `pvecm status`, on standalone nodes it falls back to `pveversion -v` to avoid noisy corosync errors.
 - Modern Unix overrides (e.g., `ls`, `cat`) are defined in `~/.zsh_aliases`, with Linux-specific tweaks such as using `batcat` when `bat` is not available.
+- Per-host overrides live in `~/.zshrc.local` (not tracked in Git) and are sourced at the end of `.zshrc`, ideal for Proxmox-only settings like a plain-text Starship config.
 - If noVNC or server terminals don’t render Nerd Font icons correctly, you can point `STARSHIP_CONFIG` at a plain-text Starship config (e.g., `~/.config/starship-plain.toml`).
 
 ## 💾 Syncing Between Machines
@@ -142,6 +144,7 @@ This setup includes:
   - Prompt: **Starship** (Jetpack preset) with Nerd Font icons
   - OS detection: sets `IS_MAC` / `IS_LINUX` flags so the same config works on macOS and Linux/Proxmox
   - Aliases: central "single source of truth" in `~/.zsh_aliases` (modern Unix overrides, data-engineering helpers)
+  - Host-local overrides: optional `~/.zshrc.local` per machine, sourced near the end of `.zshrc` for tweaks that should not be synced via Git (e.g., Proxmox-only env vars or Starship config).
   - Plugins via Zap: `zsh-autosuggestions`, `fast-syntax-highlighting` (loaded last for correct highlighting)
   - Extra tooling: `zoxide` (smart cd with `z`/`zi`), `thefuck` (command corrections), `fzf` (fuzzy search and history)
 

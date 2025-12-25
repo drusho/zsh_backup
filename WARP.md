@@ -90,8 +90,9 @@ The `.zshrc` file follows this high-level initialization order:
 1. **Core env and OS detection** - PATH tweaks plus `IS_MAC` / `IS_LINUX` flags
 2. **Prompt and Zap initialization** - Starship init and Zap plugin manager (`plug` definitions)
 3. **Tool initialization** - `rbenv`, `zoxide`, `direnv`, `fzf`, `atuin`, `uv`, Docker helpers, etc.
-4. **Aliases and OS-specific helpers** - `~/.zsh_aliases` for shared aliases, then Linux/Proxmox-only aliases (e.g., `vms`, `cts`, `pvestat`)
-5. **Syntax highlighting** - `fast-syntax-highlighting` is intentionally loaded last so it sees all aliases and functions
+4. **Aliases and OS-specific helpers** - `~/.zsh_aliases` for shared aliases, then Linux/Proxmox-only aliases/functions (e.g., `vms`, `cts`, `pvestat`)
+5. **Host-local overrides** - optional `~/.zshrc.local` per host for unsynced tweaks (e.g., Proxmox-only environment, alternate Starship config)
+6. **Syntax highlighting** - `fast-syntax-highlighting` is intentionally loaded last so it sees all aliases and functions
 
 **Critical**: Tool configuration and aliases MUST come after Zap initialization so plugins and prompt are available, and syntax highlighting MUST remain at the end of the file.
 
@@ -101,6 +102,7 @@ The `.zshrc` file follows this high-level initialization order:
 - **Plugin manager**: Zap (`plug`-based plugin loading)
 - **Essential plugins**: `zsh-autosuggestions`, `fast-syntax-highlighting` (loaded last for correct alias/function highlighting)
 - **Modern tools**: `eza` (replaces `ls`), `zoxide` (`z` command for smart navigation), `fzf` (fuzzy finder and history search), `thefuck` (command corrections)
+- **Host-local overrides**: `~/.zshrc.local` sourced at the end of `.zshrc` for per-host customizations (e.g., Proxmox-only `STARSHIP_CONFIG`)
 - **History search**: FZF integration via `Ctrl+R` plus optional Atuin-backed history
 
 ### Homebrew Management
