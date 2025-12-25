@@ -11,6 +11,14 @@ alias du='dust -r'  # Readable disk usage
 alias top='btop'
 alias help='tldr'
 
+# Linux-specific overrides (e.g., Proxmox console / Debian hosts)
+if ${IS_LINUX:-false}; then
+  # On Debian, bat is often installed as 'batcat'
+  alias cat='batcat --style=plain'
+
+  # Prefer a detailed default ls on servers
+  alias ls='eza -al --group-directories-first --icons'
+fi
 # ===== Data Engineering Essentials =====
 # Query CSV/Parquet instantly without a notebook
 alias dsql='duckdb'

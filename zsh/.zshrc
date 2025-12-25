@@ -1,8 +1,22 @@
 # ===== PATH Configuration (Load First) =====
 export PATH="$HOME/.local/bin:$PATH"  # uv tools and local binaries
 
+# ===== OS Detection =====
+OS_NAME="$(uname -s)"
+
+IS_MAC=false
+IS_LINUX=false
+
+case "$OS_NAME" in
+  Darwin) IS_MAC=true ;;
+  Linux)  IS_LINUX=true ;;
+esac
+
 # Starship prompt (Jetpack preset)
 # Configuration: ~/.config/starship.toml
+# On Proxmox/noVNC consoles that can't display Nerd Font icons, you can
+# switch to Starship's plain-text-symbols preset by pointing STARSHIP_CONFIG
+# at an alternate config (for example: ~/.config/starship-plain.toml).
 eval "$(starship init zsh)"
 
 # Initialize Zap (Zsh plugin manager)
@@ -15,8 +29,8 @@ fi
 
 # Plugins managed by Zap
 plug "zsh-users/zsh-autosuggestions"
-plug "zdharma-continuum/fast-syntax-highlighting"
-
+# NOTE: fast-syntax-highlighting is loaded at the end of this file
+# after aliases/functions so it can correctly highlight them.
 # thefuck integration (replaces Oh My Zsh thefuck plugin)
 if command -v thefuck >/dev/null 2>&1; then
   eval "$(thefuck --alias)"
@@ -24,69 +38,28 @@ fi
 
 # User configuration, aliases, and functions should go AFTER plugins.
 # rbenv
-eval "$(rbenv init - zsh)"
+if command -v rbenv >/dev/null 2>&1; then
+  eval "$(rbenv init - zsh)"
+fi
 
 # zoxide (better cd) - smart directory navigation
-eval "$(zoxide init zsh)"  # Initialize zoxide with 'z' and 'zi' commands
+if command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init zsh)"  # Initialize zoxide with 'z' and 'zi' commands
+fi
 
 # direnv - automatic environment switching for projects
 if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook zsh)"
 fi
 
-# ===== Modern CLI Tool Aliases & Configurations =====
-
-# eza (better ls) aliases
-# Use ls for a detailed, pretty, directory-first listing with git integration
-alias ls='eza -al --group-directories-first --icons --color=always --git'
-# Common variants
-alias ll='eza -al --group-directories-first --icons --git'
-alias ld='eza -lD --icons'
-alias lf='eza -lF --color=always --icons | grep -v /'
-alias lh='eza -dl .* --group-directories-first --icons'
-alias lt='eza -al --sort=modified --icons --git'
-
-# bat (better cat) - syntax highlighting for files
-# bat (better cat) - syntax highlighting for files
-alias cat='bat --style=auto'  # Default: use bat instead of cat
-alias bat='bat --style=auto'  # Explicit bat command
-alias catp='bat --style=plain'  # Plain output (no decorations)
-alias bathelp='bat --plain --language=help'
-alias less='bat --style=plain --paging=always'  # Use bat for less
-alias more='bat --style=plain --paging=always'  # Use bat for more
-help() {
-    "$@" --help 2>&1 | bathelp
-}
-
-# ripgrep (better grep) - faster searching
-alias grep='rg'  # Default: use ripgrep instead of grep
-alias egrep='rg'  # Extended grep
-alias fgrep='rg -F'  # Fixed string grep
-alias rgi='rg -i'  # Case insensitive
-alias rgl='rg -l'  # Show only filenames
-
-# fd (better find) - simpler and faster
-alias find='fd'  # Default: use fd instead of find
-alias fda='fd -H'  # Show hidden files
-alias fdi='fd -i'  # Case insensitive
-
-# dust (better du) - disk usage visualization
-alias du='dust'  # Default: use dust instead of du
-alias dud='dust -d 1'  # One level deep
-alias duall='dust -d 0'  # All levels
-
-# procs (better ps) - modern process viewer
-alias ps='procs'  # Default: use procs instead of ps
-alias pstree='procs --tree'  # Process tree view
-alias pswatch='procs --watch'  # Watch processes
-
-# btop (better top) - beautiful system monitor
-alias top='btop'  # Default: use btop instead of top
-alias htop='btop'  # Also replace htop
-
+# ===== Modern CLI Tool Configuration =====
+# NOTE: Alias definitions for ls/cat/grep/find/du/top/etc. live in ~/.zsh_aliases
+# to keep a single source of truth across machines (macOS, Proxmox, etc.).
 # fzf - fuzzy finder integration
 # Set up fzf key bindings and fuzzy completion
-source <(fzf --zsh)
+if command -v fzf >/dev/null 2>&1; then
+  source <(fzf --zsh)
+fi
 
 # Use fd instead of find for fzf (respects .gitignore)
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
@@ -154,10 +127,21 @@ fi
 # Docker shortcuts for Data Engineer workflows
 if command -v docker >/dev/null 2>&1; then
   alias dps='docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"'  # Pretty process list
-  alias dlog='docker logs -f'  # Follow logs (usage: dlog container-name)
-  alias dexec='docker exec -it'  # Interactive exec (usage: dexec container-name bash)
+  alias dlog='docker logs -f'              # Follow logs (usage: dlog container-name)
+  alias dexec='docker exec -it'            # Interactive exec (usage: dexec container-name bash)
   alias dstop='docker stop $(docker ps -q)'  # Stop all running containers
-  alias dprune='docker system prune -af --volumes'  # Clean up everything (use with caution)
+
+  # Safer system prune with an explicit confirmation prompt
+  dprune() {
+    echo "This will run: docker system prune -af --volumes"
+    printf "Are you sure you want to remove ALL unused containers, images, networks, and volumes? [y/N] "
+    read -r reply
+    if [[ "$reply" == [Yy] || "$reply" == "yes" || "$reply" == "YES" ]]; then
+      docker system prune -af --volumes
+    else
+      echo "dprune aborted."
+    fi
+  }
 fi
 
 # Python environment indicator (shows active venv in prompt)
@@ -261,4 +245,27 @@ homelab-ssh() {
 if [ -f ~/.zsh_aliases ]; then
     source ~/.zsh_aliases
 fi
+
+# ===== Proxmox / Linux-specific aliases =====
+if ${IS_LINUX:-false}; then
+  # Proxmox core management
+  alias vms='qm list'                         # Lists all Virtual Machines and their status
+  alias cts='pct list'                        # Lists all LXC containers
+  alias pve-top='pveversion -v'               # Proxmox version and kernel details
+  alias pve-logs='journalctl -f -u pveproxy'  # Follow Proxmox web interface logs
+  alias storage='pvesm status'                # Status of all configured storage
+
+  # Proxmox hypervisor helpers
+  alias pvestat='pvestatac status'                 # Quick cluster health
+  alias vmlist='qm list'                           # List all VMs
+  alias ctlist='pct list'                          # List all Containers
+  alias vmlog='tail -f /var/log/pve/tasks/index'   # Real-time task logs
+
+  # Homelab maintenance
+  alias update='apt update && apt dist-upgrade -y'
+  alias cleanup='apt autoremove && apt autoclean'
+fi
+
+# ===== Syntax highlighting (must be last) =====
+plug "zdharma-continuum/fast-syntax-highlighting"
 
