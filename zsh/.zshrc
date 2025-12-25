@@ -274,6 +274,13 @@ if ${IS_LINUX:-false}; then
   alias cleanup='apt autoremove && apt autoclean'
 fi
 
+# ===== Host-local overrides =====
+# Source ~/.zshrc.local if present. This file is not tracked in Git and is
+# intended for per-host tweaks (e.g., different STARSHIP_CONFIG on Proxmox).
+if [ -f "$HOME/.zshrc.local" ]; then
+  source "$HOME/.zshrc.local"
+fi
+
 # ===== Syntax highlighting (must be last) =====
 plug "zdharma-continuum/fast-syntax-highlighting"
 
