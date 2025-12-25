@@ -256,7 +256,15 @@ if ${IS_LINUX:-false}; then
   alias storage='pvesm status'                # Status of all configured storage
 
   # Proxmox hypervisor helpers
-  alias pvestat='pvecm status'                     # Quick cluster / node status
+  pvestat() {
+    # On clustered nodes, show full corosync cluster status.
+    # On single nodes (no /etc/pve/corosync.conf), fall back to pveversion.
+    if [[ -f /etc/pve/corosync.conf ]]; then
+      pvecm status
+    else
+      pveversion -v
+    fi
+  }
   alias vmlist='qm list'                           # List all VMs
   alias ctlist='pct list'                          # List all Containers
   alias vmlog='tail -f /var/log/pve/tasks/index'   # Real-time task logs
