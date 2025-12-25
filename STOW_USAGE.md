@@ -150,6 +150,28 @@ git commit -m "Add newpackage configuration"
 git push
 ```
 
+### Setting Up on Proxmox / Linux
+
+The same Stow layout can be used on Linux/Proxmox servers:
+
+```bash
+# Install prerequisites (Debian/Proxmox example)
+sudo apt update
+sudo apt install -y git zsh stow
+
+# Clone dotfiles
+git clone git@github.com:drusho/zsh_backup.git ~/.dotfiles
+
+# Stow only what you need (typically zsh and tmux)
+cd ~
+stow -d .dotfiles zsh tmux
+
+# Make Zsh the default shell
+chsh -s "$(command -v zsh)"
+```
+
+On Linux, `.zshrc` automatically sets `IS_LINUX=true` and enables Proxmox/homelab aliases while reusing the same core config as macOS.
+
 ## Troubleshooting
 
 ### Stow Says "Existing Target"

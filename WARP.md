@@ -4,11 +4,11 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 ## Repository Purpose
 
-This is a **macOS dotfiles repository** for backing up and managing shell configurations, Homebrew packages, iTerm2 settings, and WezTerm configuration. The goal is to enable complete restoration of a development environment on any new Mac.
+This is a **macOS-focused dotfiles repository** for backing up and managing shell configurations, Homebrew packages, iTerm2 settings, and WezTerm configuration. The Zsh configuration is OS-aware, so it can also be reused on Linux/Proxmox servers while keeping a single source of truth in Git.
 
 ## Key Files
 
-- **`zsh/.zshrc`** - Zsh shell configuration using the Zap plugin manager, Spaceship prompt, and custom functions
+- **`zsh/.zshrc`** - Zsh shell configuration using the Zap plugin manager, Starship prompt, OS-detection, and custom functions (loads `~/.zsh_aliases` for aliases)
 - **`tmux/.tmux.conf`** - Tmux configuration with Catppuccin theme and plugins
 - **`wezterm/.wezterm.lua`** - WezTerm terminal emulator configuration with Cobalt2-inspired theme
 - **`Brewfile`** - Complete list of Homebrew packages (CLI tools, apps, VS Code extensions)
@@ -86,19 +86,22 @@ This repository uses **GNU Stow** for dotfile management with a centralized dire
 
 ### Zsh Configuration Structure
 
-The `.zshrc` file follows this initialization order:
-1. **Prompt and Zap initialization** - Spaceship prompt settings and Zap plugin definitions
-2. **User configuration** - Custom aliases, functions, and tool initialization (modern CLI tools, history, etc.)
+The `.zshrc` file follows this high-level initialization order:
+1. **Core env and OS detection** - PATH tweaks plus `IS_MAC` / `IS_LINUX` flags
+2. **Prompt and Zap initialization** - Starship init and Zap plugin manager (`plug` definitions)
+3. **Tool initialization** - `rbenv`, `zoxide`, `direnv`, `fzf`, `atuin`, `uv`, Docker helpers, etc.
+4. **Aliases and OS-specific helpers** - `~/.zsh_aliases` for shared aliases, then Linux/Proxmox-only aliases (e.g., `vms`, `cts`, `pvestat`)
+5. **Syntax highlighting** - `fast-syntax-highlighting` is intentionally loaded last so it sees all aliases and functions
 
-**Critical**: User configuration MUST come AFTER Zap initialization so plugins and prompt are available.
+**Critical**: Tool configuration and aliases MUST come after Zap initialization so plugins and prompt are available, and syntax highlighting MUST remain at the end of the file.
 
 ### Key Zsh Components
 
-- **Theme**: Spaceship prompt (async, minimal sections for performance)
+- **Prompt**: Starship (Jetpack preset), configured via `~/.config/starship.toml` (with optional plain-text config for limited fonts)
 - **Plugin manager**: Zap (`plug`-based plugin loading)
-- **Essential plugins**: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`
+- **Essential plugins**: `zsh-autosuggestions`, `fast-syntax-highlighting` (loaded last for correct alias/function highlighting)
 - **Modern tools**: `eza` (replaces `ls`), `zoxide` (`z` command for smart navigation), `fzf` (fuzzy finder and history search), `thefuck` (command corrections)
-- **History search**: FZF integration via `Ctrl+R` (industry standard, replaces hstr)
+- **History search**: FZF integration via `Ctrl+R` plus optional Atuin-backed history
 
 ### Homebrew Management
 
@@ -112,12 +115,14 @@ The `Brewfile` contains three types of installations:
 
 ### Tool Dependencies
 
-Several tools must be initialized in `.zshrc`:
+Several tools are initialized in `.zshrc` when available (guarded with `command -v ...`):
 - **rbenv** - Ruby version manager (`eval "$(rbenv init - zsh)"`)
 - **zoxide** - Smart directory navigation (`eval "$(zoxide init zsh)"`) - creates `z` and `zi` commands
 - **fzf** - Fuzzy finder integration (`source <(fzf --zsh)`) - enables Ctrl+R history search, Ctrl+T file search, Alt+C directory search
 - **thefuck** - Command correction (`eval "$(thefuck --alias)"`) - creates `fuck` alias
-- **iTerm2 shell integration** - Required for iTerm2 features
+- **Atuin** - Optional advanced history backend (`eval "$(atuin init zsh)"`)
+- **Starship** - Prompt initializer (`eval "$(starship init zsh)"`)
+- **iTerm2 shell integration** - Required for iTerm2 features on macOS only
 
 ### Symlink Management
 

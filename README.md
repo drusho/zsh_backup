@@ -1,8 +1,8 @@
-# My macOS Development Environment
+# My macOS Development Environment (with Linux/Proxmox support)
 
 This repository contains the complete configuration for my macOS development environment. It uses **GNU Stow** to manage dotfiles and settings for Zsh, tmux, iTerm2, Homebrew, and various modern command-line tools.
 
-The primary goal is to be able to completely and automatically restore my preferred setup on any new Mac in minutes.
+The primary goal is to be able to completely and automatically restore my preferred setup on any new Mac in minutes, while also reusing the same Zsh configuration on Linux/Proxmox servers via OS-aware logic.
 
 ## 🚀 Setting Up a New Mac
 
@@ -60,6 +60,31 @@ tmux
 
 Completely quit and restart iTerm2 for all changes to take effect. Your new professional environment is now ready!
 
+## 🖥 Using This Repo on Linux/Proxmox
+
+The Zsh configuration is OS-aware and works on Linux/Proxmox terminals in addition to macOS:
+
+1. Install dependencies (Debian/Proxmox example):
+   ```bash
+   sudo apt update
+   sudo apt install -y git zsh stow fzf zoxide eza bat ripgrep fd-find dust btop
+   ```
+2. Clone the repo (same layout as macOS):
+   ```bash
+   git clone git@github.com:drusho/zsh_backup.git ~/.dotfiles
+   cd ~/.dotfiles
+   stow zsh tmux
+   ```
+3. Set Zsh as the default shell and re-login:
+   ```bash
+   chsh -s "$(command -v zsh)"
+   ```
+
+On Linux/Proxmox hosts:
+- `.zshrc` auto-detects Linux (`IS_LINUX=true`) and enables Proxmox/homelab aliases like `vms`, `cts`, `pvestat`, `pve-logs`, `storage`, `update`, and `cleanup`.
+- Modern Unix overrides (e.g., `ls`, `cat`) are defined in `~/.zsh_aliases`, with Linux-specific tweaks such as using `batcat` when `bat` is not available.
+- If noVNC or server terminals don’t render Nerd Font icons correctly, you can point `STARSHIP_CONFIG` at a plain-text Starship config (e.g., `~/.config/starship-plain.toml`).
+
 ## 💾 Syncing Between Machines
 
 ### How Stow Works
@@ -113,9 +138,12 @@ git push
 This setup includes:
 
 ### Shell Configuration
-- **Zsh** (`.zshrc`): Zap plugin manager with Spaceship prompt and modern plugins
-  - Managed via Zap: `spaceship-prompt`, `zsh-autosuggestions`, `fast-syntax-highlighting`
-  - Extra tooling: `zoxide` (smart cd with `z` command), `thefuck` (command corrections), `fzf` (fuzzy search)
+- **Zsh** (`.zshrc` + `.zsh_aliases`): OS-aware Zap-based configuration with Starship prompt and modern plugins
+  - Prompt: **Starship** (Jetpack preset) with Nerd Font icons
+  - OS detection: sets `IS_MAC` / `IS_LINUX` flags so the same config works on macOS and Linux/Proxmox
+  - Aliases: central "single source of truth" in `~/.zsh_aliases` (modern Unix overrides, data-engineering helpers)
+  - Plugins via Zap: `zsh-autosuggestions`, `fast-syntax-highlighting` (loaded last for correct highlighting)
+  - Extra tooling: `zoxide` (smart cd with `z`/`zi`), `thefuck` (command corrections), `fzf` (fuzzy search and history)
 
 ### Terminal Multiplexer
 - **tmux** (`.tmux.conf`): Full mouse support, Catppuccin Mocha theme
