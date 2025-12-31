@@ -54,6 +54,10 @@ alias git-clean="git branch --merged | grep -v '^\*' | xargs -n 1 git branch -d"
 # ===== Homelab & Server Management =====
 # Quick SSH to homelab NAS
 alias homelab='ssh admin@192.168.1.249'
+
+# Quick SSH to AI Ubuntu VM (Proxmox VM 102)
+alias vm_ai='ssh david@192.168.1.44'
+
 # Sync local folder to server via rclone
 alias sync-lab='rclone sync ~/projects/ homelab:projects/ --progress'
 
@@ -63,3 +67,143 @@ alias sync-lab='rclone sync ~/projects/ homelab:projects/ --progress'
 # dexec - Interactive exec into container
 # dstop - Stop all running containers
 # dprune - Clean up docker system
+
+# ===== Proxmox VM Control (Gaming vs AI/LLMs) =====
+# NOTE: Set PROXMOX_HOST to the Proxmox *hypervisor* user that can run `qm`,
+#       NOT to a guest VM like Ubuntu-AI-Docker.
+#       Example: PROXMOX_HOST="root@192.168.1.xx" or "david@proxmox-host".
+
+# SSH target for Proxmox hypervisor (REQUIRED – update to your actual host)
+PROXMOX_HOST="root@192.168.1.xx"
+
+# Get VM status (e.g., "running", "stopped", etc.)
+proxmox_vm_status() {
+  local vmid=$1
+  ssh "$PROXMOX_HOST" "qm status $vmid" 2>/dev/null | awk '/status:/ {print $2}'
+}
+
+# Wait until VM reaches a desired state, printing progress updates
+proxmox_wait_for_state() {
+  local vmid=$1
+  local desired=$2
+  local label=$3
+  local status
+
+  echo "Waiting for VM $vmid ($label) to be '$desired'..."
+  while true; do
+    status=$(proxmox_vm_status "$vmid")
+    if [[ -z "$status" ]]; then
+      echo "  Could not get status for VM $vmid; check SSH connection and qm access."
+      return 1
+    fi
+    echo "  Current status: $status"
+    if [[ "$status" == "$desired" ]]; then
+      break
+    fi
+    sleep 5
+  done
+}
+
+# Stop a VM if it's running, and wait until fully stopped
+proxmox_stop_vm_if_running() {
+  local vmid=$1
+  local label=$2
+  local status
+
+  status=$(proxmox_vm_status "$vmid")
+  if [[ "$status" == "running" ]]; then
+    echo "VM $vmid ($label) is running; sending shutdown request..."
+    ssh "$PROXMOX_HOST" "qm shutdown $vmid" || {
+      echo "Failed to issue shutdown for VM $vmid ($label)."
+      return 1
+    }
+    proxmox_wait_for_state "$vmid" "stopped" "$label" || return 1
+    echo "VM $vmid ($label) is now fully stopped."
+  else
+    echo "VM $vmid ($label) is not running (status: $status); no shutdown needed."
+  fi
+}
+
+# Start a VM if it's not running, and wait until fully running
+proxmox_start_vm_if_needed() {
+  local vmid=$1
+  local label=$2
+  local status
+
+  status=$(proxmox_vm_status "$vmid")
+  if [[ "$status" == "running" ]]; then
+    echo "VM $vmid ($label) is already running."
+  else
+    echo "Starting VM $vmid ($label)..."
+    ssh "$PROXMOX_HOST" "qm start $vmid" || {
+      echo "Failed to start VM $vmid ($label)."
+      return 1
+    }
+    proxmox_wait_for_state "$vmid" "running" "$label" || return 1
+    echo "VM $vmid ($label) is now running."
+  fi
+}
+
+# --- Mode 1: Gaming (Windows 101 on, Ubuntu-AI 102 off) ---
+proxmox_gaming() {
+  echo "=== Proxmox mode: Gaming ==="
+  echo "You chose: Gaming (Windows)."
+  echo "This will:"
+  echo "  - Stop VM 102 (Ubuntu-AI-Docker)"
+  echo "  - Start VM 101 (Windows, Gaming)"
+  echo
+
+  read -q "REPLY?Proceed with these actions? [y/N] "; echo
+  if [[ "$REPLY" != [Yy] ]]; then
+    echo "Aborted. No changes made."
+    return 1
+  fi
+
+  echo "Checking current VM states on $PROXMOX_HOST..."
+  ssh "$PROXMOX_HOST" "qm status 101; qm status 102" || {
+    echo "Failed to query VM status; check SSH connection or qm availability."
+    return 1
+  }
+
+  # Ensure AI VM is fully stopped first
+  proxmox_stop_vm_if_running 102 "Ubuntu-AI-Docker" || return 1
+
+  # Then start Gaming VM
+  proxmox_start_vm_if_needed 101 "Windows (Gaming)" || return 1
+
+  echo "✅ Gaming mode ready: VM 101 (Windows) is running and ready to access."
+}
+
+# --- Mode 2: AI and Local LLMs (Ubuntu-AI 102 on, Windows 101 off) ---
+proxmox_ai() {
+  echo "=== Proxmox mode: AI & Local LLMs ==="
+  echo "You chose: AI and Local LLMs."
+  echo "This will:"
+  echo "  - Stop VM 101 (Windows)"
+  echo "  - Start VM 102 (Ubuntu-AI-Docker)"
+  echo
+
+  read -q "REPLY?Proceed with these actions? [y/N] "; echo
+  if [[ "$REPLY" != [Yy] ]]; then
+    echo "Aborted. No changes made."
+    return 1
+  fi
+
+  echo "Checking current VM states on $PROXMOX_HOST..."
+  ssh "$PROXMOX_HOST" "qm status 101; qm status 102" || {
+    echo "Failed to query VM status; check SSH connection or qm availability."
+    return 1
+  }
+
+  # Ensure Gaming VM is fully stopped first
+  proxmox_stop_vm_if_running 101 "Windows (Gaming)" || return 1
+
+  # Then start AI VM
+  proxmox_start_vm_if_needed 102 "Ubuntu-AI-Docker" || return 1
+
+  echo "✅ AI mode ready: VM 102 (Ubuntu-AI-Docker) is running and ready to access."
+}
+
+# Optional short aliases
+alias start_gaming_vm='proxmox_gaming'
+alias start_ai_vm='proxmox_ai'
