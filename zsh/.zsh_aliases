@@ -71,10 +71,10 @@ alias sync-lab='rclone sync ~/projects/ homelab:projects/ --progress'
 # ===== Proxmox VM Control (Gaming vs AI/LLMs) =====
 # NOTE: Set PROXMOX_HOST to the Proxmox *hypervisor* user that can run `qm`,
 #       NOT to a guest VM like Ubuntu-AI-Docker.
-#       Example: PROXMOX_HOST="root@192.168.1.xx" or "david@proxmox-host".
+#       Example: PROXMOX_HOST="root@192.168.1.50" or "david@proxmox-host".
 
-# SSH target for Proxmox hypervisor (REQUIRED – update to your actual host)
-PROXMOX_HOST="root@192.168.1.xx"
+# SSH target for Proxmox hypervisor
+PROXMOX_HOST="root@192.168.1.50"
 
 # Get VM status (e.g., "running", "stopped", etc.)
 proxmox_vm_status() {
@@ -87,17 +87,17 @@ proxmox_wait_for_state() {
   local vmid=$1
   local desired=$2
   local label=$3
-  local status
+  local vm_status
 
   echo "Waiting for VM $vmid ($label) to be '$desired'..."
   while true; do
-    status=$(proxmox_vm_status "$vmid")
-    if [[ -z "$status" ]]; then
+    vm_status=$(proxmox_vm_status "$vmid")
+    if [[ -z "$vm_status" ]]; then
       echo "  Could not get status for VM $vmid; check SSH connection and qm access."
       return 1
     fi
-    echo "  Current status: $status"
-    if [[ "$status" == "$desired" ]]; then
+    echo "  Current status: $vm_status"
+    if [[ "$vm_status" == "$desired" ]]; then
       break
     fi
     sleep 5
@@ -108,19 +108,24 @@ proxmox_wait_for_state() {
 proxmox_stop_vm_if_running() {
   local vmid=$1
   local label=$2
-  local status
+  local vm_status
 
-  status=$(proxmox_vm_status "$vmid")
-  if [[ "$status" == "running" ]]; then
+  vm_status=$(proxmox_vm_status "$vmid")
+  if [[ "$vm_status" == "running" ]]; then
     echo "VM $vmid ($label) is running; sending shutdown request..."
-    ssh "$PROXMOX_HOST" "qm shutdown $vmid" || {
-      echo "Failed to issue shutdown for VM $vmid ($label)."
-      return 1
-    }
+    if ! ssh "$PROXMOX_HOST" "qm shutdown $vmid"; then
+      echo "Shutdown command for VM $vmid ($label) reported an error (often a timeout)."
+      echo "Retrying shutdown once more in 5 seconds..."
+      sleep 5
+      if ! ssh "$PROXMOX_HOST" "qm shutdown $vmid"; then
+        echo "Second shutdown attempt for VM $vmid ($label) also reported an error."
+        echo "Will continue waiting to see if the VM powers down (you can also shut it down from the Proxmox UI)."
+      fi
+    fi
     proxmox_wait_for_state "$vmid" "stopped" "$label" || return 1
     echo "VM $vmid ($label) is now fully stopped."
   else
-    echo "VM $vmid ($label) is not running (status: $status); no shutdown needed."
+    echo "VM $vmid ($label) is not running (status: $vm_status); no shutdown needed."
   fi
 }
 
@@ -128,10 +133,10 @@ proxmox_stop_vm_if_running() {
 proxmox_start_vm_if_needed() {
   local vmid=$1
   local label=$2
-  local status
+  local vm_status
 
-  status=$(proxmox_vm_status "$vmid")
-  if [[ "$status" == "running" ]]; then
+  vm_status=$(proxmox_vm_status "$vmid")
+  if [[ "$vm_status" == "running" ]]; then
     echo "VM $vmid ($label) is already running."
   else
     echo "Starting VM $vmid ($label)..."
