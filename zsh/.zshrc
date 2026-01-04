@@ -272,6 +272,71 @@ if ${IS_LINUX:-false}; then
   # Homelab maintenance
   alias update='apt update && apt dist-upgrade -y'
   alias cleanup='apt autoremove && apt autoclean'
+
+  # Proxmox stats dashboard (only on proxmox host)
+  if [[ $(hostname) == proxmox ]]; then
+    proxmox_stats() {
+      clear
+      local CYAN='\033[0;36m'
+      local GREEN='\033[0;32m'
+      local RED='\033[0;31m'
+      local YELLOW='\033[1;33m'
+      local NC='\033[0m'
+      local BOLD='\033[1m'
+
+      echo -e "${CYAN}┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+      echo -e "${CYAN}┃${BOLD}  PROXMOX NODE: $(hostname) | ENTERPRISE SYSTEM MONITOR             ${NC}${CYAN}┃${NC}"
+      echo -e "${CYAN}┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+
+      echo -e "${BOLD}▶ EPYC 7532 THERMALS (CCD)${NC}"
+      sensors k10temp-pci-00c3 | grep 'Tccd' | awk -v y="$YELLOW" -v n="$NC" '{printf "  %-7s %s%-8s%s", $1, y, $2, n} NR%4==0{print ""}'
+      echo -e ""
+
+      echo -e "${BOLD}▶ SYSTEM FANS${NC}"
+      ipmitool sdr | grep "FAN" | grep -v "no reading" | awk -v c="$CYAN" -v n="$NC" -F'|' '{
+        l=$1; gsub(/ +$/, "", l);
+        v=$2; gsub(/ +$/, "", v);
+        printf "  %-10s %s%-15s%s", l, c, v, n
+      } NR%2==0{print ""}'
+      echo -e "\n"
+
+      echo -e "${BOLD}▶ MEMORY TOPOLOGY (SIZE & SPEED)${NC}"
+      echo -e "  SLOT       READOUT       SIZE      SPEED       STATUS"
+      echo -e "  ━━━━       ━━━━━━━       ━━━━      ━━━━━       ━━━━━━"
+      ipmitool sdr | grep "DIMM" | awk -v r="$RED" -v g="$GREEN" -v n="$NC" -F'|' '{
+        l=$1; gsub(/ Temp/, "", l); gsub(/ +$/, "", l);
+        t=$2; gsub(/ degrees/, "", t); gsub(/ +$/, "", t);
+        s="16 GB"; sp="2133 MT/s";
+        stat=(index(l, "DIMMH1")) ? r"⚠️  GHOST"n : g"✅ ACTIVE"n;
+        printf "  %-10s %-13s %-9s %-11s %s\n", l, t, s, sp, stat
+      }'
+      echo -e ""
+
+      echo -e "${BOLD}▶ STORAGE & NETWORK${NC}"
+      smartctl -a /dev/nvme0 | awk -v c="$CYAN" -v n="$NC" '/Temperature:/ {t=$2} /Percentage Used:/ {p=$3} END {printf "  NVMe 0:  %s%s°C%s | Wear: %s%s%s\n", c, t, n, c, p, n}'
+      command grep -E "eth|enp|eno" /proc/net/dev | head -n 1 | awk -v c="$CYAN" -v n="$NC" '{printf "  NET IN:  %s%.2f MB%s | NET OUT: %s%.2f MB%s\n", c, $2/1048576, n, c, $10/1048576, n}'
+      echo -e ""
+
+      echo -e "${BOLD}▶ GPU & VIRTUALIZATION${NC}"
+      if nvidia-smi > /dev/null 2>&1; then
+        nvidia-smi --query-gpu=temperature.gpu,utilization.gpu --format=csv,noheader,nounits | \
+        awk -v g="$GREEN" -v n="$NC" -F', ' '{printf "  RTX 3090: %s%s°C%s | Load: %s%s%%%s\n", g, $1, n, g, $2, n}'
+      else
+        echo -e "  RTX 3090: ${YELLOW}In Use by Windows VM (Passthrough)${NC}"
+      fi
+      awk -v c="$CYAN" -v n="$NC" '/HugePages_Total/ {t=$2} /HugePages_Free/ {f=$2} END {printf "  RAM Pool: %s%.2f GB%s / 64.00 GB Locked\n", c, ((t-f)*2048)/(1024*1024), n}' /proc/meminfo
+      echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    }
+
+    # quick manual trigger inside Proxmox
+    alias pstats='proxmox_stats'
+
+    # auto-run stats for interactive SSH sessions to this host
+    if [[ -o interactive ]] && [[ -n $SSH_CONNECTION ]] && [[ -z $PROXMOX_STATS_SHOWN ]]; then
+      export PROXMOX_STATS_SHOWN=1
+      proxmox_stats
+    fi
+  fi
 fi
 
 # ===== Host-local overrides =====
