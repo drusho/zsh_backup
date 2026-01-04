@@ -318,11 +318,20 @@ if ${IS_LINUX:-false}; then
       echo -e ""
 
       echo -e "${BOLD}▶ GPU & VIRTUALIZATION${NC}"
-      if nvidia-smi > /dev/null 2>&1; then
-        nvidia-smi --query-gpu=temperature.gpu,utilization.gpu --format=csv,noheader,nounits | \
-        awk -v g="$GREEN" -v n="$NC" -F', ' '{printf "  RTX 3090: %s%s°C%s | Load: %s%s%%%s\n", g, $1, n, g, $2, n}'
+      if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi -L >/dev/null 2>&1; then
+        # Show core + VRAM temps, utilization, and VRAM usage when NVIDIA driver is active on host
+        nvidia-smi --query-gpu=temperature.gpu,temperature.memory,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader,nounits | \
+        awk -v g="$GREEN" -v n="$NC" -F', ' '{
+          printf "  RTX 3090: %s%s°C%s core | %s%s°C%s vram | Load: %s%s%%%s core, %s%s%%%s mem | VRAM: %s%s/%s MiB%s\n",
+                 g, $1, n,
+                 g, $2, n,
+                 g, $3, n,
+                 g, $4, n,
+                 g, $5, $6, n
+        }'
       else
-        echo -e "  RTX 3090: ${YELLOW}In Use by Windows VM (Passthrough)${NC}"
+        # With GPU passed through via VFIO, the host NVIDIA driver cannot see temps at all
+        echo -e "  RTX 3090: ${YELLOW}Not visible to NVIDIA driver on host (VFIO/passthrough active)${NC}"
       fi
       awk -v c="$CYAN" -v n="$NC" '/HugePages_Total/ {t=$2} /HugePages_Free/ {f=$2} END {printf "  RAM Pool: %s%.2f GB%s / 64.00 GB Locked\n", c, ((t-f)*2048)/(1024*1024), n}' /proc/meminfo
       echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
