@@ -68,6 +68,61 @@ alias sync-lab='rclone sync ~/projects/ homelab:projects/ --progress'
 # dstop - Stop all running containers
 # dprune - Clean up docker system
 
+# ===== Media Downloads =====
+video_download() {
+  local mytitle myresolution myurl height format
+
+  # Non-interactive usage:
+  #   video_download "My Title" 1080p "https://..."
+  if [[ $# -ge 3 ]]; then
+    mytitle="$1"
+    myresolution="$2"
+    myurl="$3"
+  else
+    printf "Enter Custom Title: "
+    read -r mytitle
+    printf "Enter Max Video Resolution (480/720/1080): "
+    read -r myresolution
+    printf "Enter Video URL: "
+    read -r myurl
+  fi
+
+  if [[ -z "$mytitle" || -z "$myresolution" || -z "$myurl" ]]; then
+    echo "Usage: video_download <title> <resolution> <url>"
+    echo "  resolution examples: 480, 720, 1080, 1080p"
+    return 1
+  fi
+
+  if ! command -v yt-dlp >/dev/null 2>&1; then
+    echo "yt-dlp not found in PATH (install with: brew install yt-dlp)"
+    return 1
+  fi
+
+  # Normalize resolution input (accept: 1080 or 1080p)
+  myresolution="${myresolution%p}"
+  case "$myresolution" in
+    480|720|1080|1440|2160) height="$myresolution" ;;
+    *)
+      echo "Unsupported resolution: $myresolution (use 480/720/1080, etc.)"
+      return 1
+      ;;
+  esac
+
+  mkdir -p "$mytitle" || return 1
+
+  # yt-dlp -f does NOT understand '1080p' directly; use a format selector.
+  # Prefer best video+audio up to the requested height, then fall back.
+  format="bv*[height<=${height}]+ba/b[height<=${height}]/best[height<=${height}]"
+
+  yt-dlp \
+    -f "$format" \
+    --write-thumbnail \
+    --convert-thumbnails jpg \
+    -o "$mytitle/$mytitle.%(ext)s" \
+    -o "thumbnail:$mytitle/backdrop.%(ext)s" \
+    "$myurl"
+}
+
 # ===== Proxmox VM Control (Gaming vs AI/LLMs) =====
 # NOTE: Set PROXMOX_HOST to the Proxmox *hypervisor* user that can run `qm`,
 #       NOT to a guest VM like Ubuntu-AI-Docker.
